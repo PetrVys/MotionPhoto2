@@ -181,7 +181,6 @@ Write-Output "Writing MotionPhoto metadata to the image..."
 Remove-Item -ErrorAction Ignore "$($outputFile).tmp1" 
 Copy-Item $imageFile -Destination "$($outputFile).tmp1"
 Remove-Item -ErrorAction Ignore "$($outputFile).tmp2" 
-Remove-Item -ErrorAction Ignore $outputFile
 
 # Copy attributes from existing XMP file
 $existingXmpString = runCmdAndCaptureOutput "$($PSScriptRoot)\exiftool -XMP -b ""$($outputFile).tmp1""" 
@@ -210,9 +209,6 @@ Write-Output "Stitching image and video together into MotionPhoto..."
 [int] $imageSz = $image.Count
 [int] $videoSz = $video.Count
 
-Remove-Item -ErrorAction Ignore "$($outputFile).tmp1"
-Remove-Item -ErrorAction Ignore "$($outputFile).tmp2"
-
 if ($imageType -eq 'heic') {
     [int32] $mpvdSizeInt = $videoSz + 8 + 76 # 8 - mpvd box size, 76 - size of full footer ($samsungTailStart + $videoOffset + $videoSize + $samsungTailEnd)
     [int32] $videoOffsetInt = $imageSz + 8 # 8 is the size of mpvd box
@@ -226,6 +222,10 @@ if ($imageType -eq 'heic') {
 [Array]::Reverse($videoOffset)
 [byte[]] $videoSize = [System.BitConverter]::GetBytes([int32]($videoSz ))
 [Array]::Reverse($videoSize)
+
+Remove-Item -ErrorAction Ignore "$($outputFile).tmp1"
+Remove-Item -ErrorAction Ignore "$($outputFile).tmp2"
+Remove-Item -ErrorAction Ignore $outputFile
 
 $fs = [System.IO.File]::OpenWrite($outputFile)
 $ws = [System.IO.BinaryWriter]::new($fs)
