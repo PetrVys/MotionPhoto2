@@ -58,6 +58,7 @@ function validateImage(
         ".jpeg" { $imageType = "jpg"; $xmp.xmpmeta.RDF.Description.Directory.Seq.li[0].Item.Mime = 'image/jpeg' }
         ".heic" { $imageType = "heic" }
         ".heif" { $imageType = "heic" }
+        ".avif" { $imageType = "heic" }
         default {
             # If the input file is of some HEIC variety with unknow extension, then the omission of mpvd box will cause it to not be accepted by GPhotos (upload will fail)
             # But if we add mpvd box to jpg-style image, it'll also not be accepted
