@@ -161,6 +161,10 @@ Write-Output "Motion Photo v2 muxer (heic compatible). Free your Live Photos!"
 Write-Output "(C) 2024 Petr Vyskocil. Licensed under MIT license."
 Write-Output ""
 
+$imageFile = ([io.fileinfo]$imageFile).FullName
+$videoFile = ([io.fileinfo]$videoFile).FullName
+$outputFile = ([io.fileinfo]$outputFile).FullName
+
 # Basic validation + setting of mime type within XMP
 $imageType = validateImage $imageFile $xmp
 $videoType = validateVideo $videoFile $xmp
