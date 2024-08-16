@@ -114,6 +114,7 @@ function validateVideo(
         xmlns:GCamera="http://ns.google.com/photos/1.0/camera/"
         xmlns:Container="http://ns.google.com/photos/1.0/container/"
         xmlns:Item="http://ns.google.com/photos/1.0/container/item/"
+		xmlns:HDRGainMap="http://ns.apple.com/HDRGainMap/1.0/"
       GCamera:MotionPhoto="1"
       GCamera:MotionPhotoVersion="1"
       GCamera:MotionPhotoPresentationTimestampUs="-1">
