@@ -23,7 +23,7 @@ PS> MotionPhoto2.ps1 -imageFile ImageFile.HEIC -videoFile VideoFile.MOV -outputF
 
 ## Limitations
 
-If the source image is a HDR HEIC image, Google Photo will say that the resulting photo is not HDR. This is not true, if you save the photo back to iPhone camera roll, you'll see the photo is HDR (and Google Photos will show it too, as long as it is in local photos). Unfortunately the same place where Motion Photos are defined (in XMP object GCamera - http://ns.google.com/photos/1.0/camera/) is also the place where Google/Android HDR information is stored. It appears that the server-side processing of Google Photos does not check for Apple HDR once it finds Google Camera header. The two formats appear to be significantly different, thus an easy conversion is not possible. See [Issue #2](https://github.com/PetrVys/MotionPhoto2/issues/2) for more details.
+If the source image is a HDR HEIC image, Google Photo will say that the resulting photo is not HDR. This is not true, if you save the photo back to iPhone camera roll, you'll see the photo is HDR (and Google Photos will show it too, as long as it is in local photos). Unfortunately the same place where Motion Photos are defined (in XMP object GCamera - `http://ns.google.com/photos/1.0/camera/`) is also the place where Google/Android HDR information is stored. It appears that the server-side processing of Google Photos does not check for Apple HDR once it finds Google Camera header. The two formats appear to be significantly different, thus an easy conversion is not possible. See [Issue #2](https://github.com/PetrVys/MotionPhoto2/issues/2) for more details.
 
 ## About
 
