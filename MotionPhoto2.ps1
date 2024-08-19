@@ -146,7 +146,7 @@ function validateVideo(
 [byte[]] $samsungTailStart = 0x00, 0x00, 0x00, 0x4c, # Length of the SamsungTrailer block
                              0x73, 0x65, 0x66, 0x64, # Samsung trailer header / HEIC top-level box ("sefd")
                              0x00, 0x00, 0x30, 0x0a, # Motion Photo Data tag header
-                             0x10, 0x00, 0x00, 0x00, # Used to be motion video size, now seems to be a magic constant
+                             0x10, 0x00, 0x00, 0x00, # 16 - length of string on next line
                              0x4d, 0x6f, 0x74, 0x69, 0x6f, 0x6e, 0x50, 0x68, 0x6f, 0x74, 0x6f, 0x5f, 0x44, 0x61, 0x74, 0x61, # Human-readable tag name "MotionPhoto_Data"
                              0x6d, 0x70, 0x76, 0x32  # "mpv2" - I guess "Motion Photo version 2"?
                              # Between $samsungTailStart and $samsungTailEnd go two Big-Endian encoded Int32 - video start offset from the start of the file and video length
