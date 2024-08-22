@@ -10,6 +10,8 @@ In order to use this, please install [ExifTool](https://exiftool.org/) and put t
 
 ## Usage
 
+### Individual photos
+
 To convert image and video pair to Motion Photo v2, run:
 
 ```
@@ -19,6 +21,16 @@ To convert image and video pair to Motion Photo v2, run:
 Alternatively, you can run the powershell script directly:
 ```
 PS> MotionPhoto2.ps1 -imageFile ImageFile.HEIC -videoFile VideoFile.MOV -outputFile MotionPhoto.HEIC
+```
+
+### Directory mode
+
+To copy whole directory of photos, converting Live Photos to Motion Photos on the fly, create target directory and use the batch file in mode `MotionPhoto2.cmd SourceDir TargetDir`:
+
+```
+> CD \Photo Library
+C:\Photo Library> MD "Fixed Library"
+C:\Photo Library> MotionPhoto2.cmd . "Fixed Library"
 ```
 
 ## Limitations
