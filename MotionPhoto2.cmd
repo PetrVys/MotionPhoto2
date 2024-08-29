@@ -2,7 +2,7 @@
 SETLOCAL EnableDelayedExpansion
 SETLOCAL EnableExtensions
 
-IF [%~1] == [] GOTO:Usage
+IF "%~1" == "" GOTO:Usage
 IF EXIST "%~1\*" GOTO:ProcessDirectory
 
 powershell.exe -executionpolicy bypass -nologo -file "%~dp0MotionPhoto2.ps1" -imageFile "%~1" -videoFile "%~2" -outputFile "%~3"
@@ -11,7 +11,7 @@ GOTO:EOF
 :ProcessDirectory
 SET _SOURCE=%~f1
 SET _TARGET=%~f1
-IF NOT [%~2] == [] (
+IF NOT "%~2" == "" (
 	IF NOT EXIST "%~f2\*" (
 		ECHO Target directory "%~f2" does not exist!
 		EXIT /b 1
