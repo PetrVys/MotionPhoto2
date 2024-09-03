@@ -6,7 +6,7 @@ In case the source is an iPhone Live Photo, the presentation timestamp will be m
 
 ## Installation
 
-In order to use this, please install [ExifTool](https://exiftool.org/) and put the files in the same directory as exiftool.exe.
+In order to use this, please install [ExifTool](https://exiftool.org/) and put the files in the same directory as exiftool.exe. Alternatively, put location of exiftool.exe into system PATH variable.
 
 ## Usage
 
@@ -35,13 +35,15 @@ C:\Photo Library> MotionPhoto2.cmd . "Fixed Library"
 
 ## Limitations
 
-If the source image is a HDR HEIC image, Google Photos will say that the resulting photo is not HDR. This is not true - if you save the photo back to iPhone camera roll, you'll see the photo is HDR.
+If the source image is an Apple HDR HEIC image, Google Photos will say that the resulting photo is not HDR. This is not true - if you save the photo back to iPhone camera roll, you'll see the photo is HDR.
 
-Google Photos _will_ actually show it too, but only when it is stored in local photos.
+Google Photos _will_ actually show it too, but only when it is stored in local photos on an iPhone/iPad.
 
 The reason is probably directly related to Motion Photos -  the same place where Motion Photos are defined (in XMP object GCamera - `http://ns.google.com/photos/1.0/camera/`) is also the place where Google/Android stores JPEG/R HDR information.
 
 It appears that the server-side processing of Google Photos does not check for Apple HDR once it finds Google Camera header in XMP tags. The two formats appear to be significantly different, thus an easy conversion is not possible. See [Issue #2](https://github.com/PetrVys/MotionPhoto2/issues/2) for more details.
+
+Hopefully, as Gainmap HDR matures, both Google and Apple will converge on ISO/CD 21496-1 and things will just start working. On Apple side as of iOS18 DB8, iOS still stores HDR in Apple format. On Google side keep a look at [libultrahdr](https://github.com/google/libultrahdr), which is most likely used in GPhotos backend.
 
 ## About
 
