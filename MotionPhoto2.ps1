@@ -27,9 +27,11 @@ function readFile(
 
 function getStillImageTime(
     [Parameter(Mandatory=$true)]
-    [string] $mov
+    [string] $mov,
+    [Parameter(Mandatory=$true)]
+    [string] $exiftool
 ) {
-    [String[]]$out = runCmdAndCaptureOutput "$($PSScriptRoot)\exiftool -X -ee -n -QuickTime:StillImageTime -QuickTime:TrackDuration ""$($mov)"""
+    [String[]]$out = runCmdAndCaptureOutput "& '$($exiftool)' -X -ee -n -QuickTime:StillImageTime -QuickTime:TrackDuration ""$($mov)"""
     [String] $presentationTimestampText = "#NaN"
     [Int] $presentationTimestamp = 0
     [String] $trackNumber = "Missing"
@@ -171,8 +173,14 @@ $outputFile = $ExecutionContext.SessionState.Path.GetUnresolvedProviderPathFromP
 $imageType = validateImage $imageFile $xmp
 $videoType = validateVideo $videoFile $xmp
 
+if (Test-Path ("$($PSScriptRoot)\exiftool.exe") -PathType Leaf) {
+    $exifTool="$($PSScriptRoot)\exiftool.exe" # take exiftool from script's directory
+} else {
+    $exifTool='exiftool.exe'                # try to run exiftool from path
+}
+
 Write-Output "Trying to extract LivePhoto timestamp..."
-[Int] $presentationTimestamp = getStillImageTime $videoFile
+[Int] $presentationTimestamp = getStillImageTime $videoFile $exifTool
 
 if ($presentationTimestamp -ne -1) {
     Write-Output "Extracted LivePhoto timestamp $($presentationTimestamp)us from QuickTime."
@@ -189,7 +197,7 @@ Copy-Item $imageFile -Destination "$($outputFile).tmp1"
 Remove-Item -ErrorAction Ignore "$($outputFile).tmp2" 
 
 # Copy attributes from existing XMP file
-$existingXmpString = runCmdAndCaptureOutput "$($PSScriptRoot)\exiftool -XMP -b ""$($outputFile).tmp1""" 
+$existingXmpString = runCmdAndCaptureOutput "& '$($exifTool)' -XMP -b ""$($outputFile).tmp1""" 
 try { 
     $existingXmp = [XML] $existingXmpString
     ForEach ($XmlNode in $existingXmp.xmpmeta.RDF.Description.ChildNodes) {
@@ -205,7 +213,7 @@ try {
 $xmp.Save("$($outputFile).tmp2")
 
 # Replace XMP attributes in the still image file with above new XMP
-runCmdAndCaptureOutput "$($PSScriptRoot)\exiftool -overwrite_original -tagsfromfile ""$($outputFile).tmp2"" -xmp ""$($outputFile).tmp1""" | Out-Null
+runCmdAndCaptureOutput "& '$($exifTool)' -overwrite_original -tagsfromfile ""$($outputFile).tmp2"" -xmp ""$($outputFile).tmp1""" | Out-Null
 
 Write-Output "Stitching image and video together into MotionPhoto..."
 
