@@ -43,7 +43,7 @@ The reason is probably directly related to Motion Photos -  the same place where
 
 It appears that the server-side processing of Google Photos does not check for Apple HDR once it finds Google Camera header in XMP tags. The two formats appear to be significantly different, thus an easy conversion is not possible. See [Issue #2](https://github.com/PetrVys/MotionPhoto2/issues/2) for more details.
 
-Hopefully, as Gainmap HDR matures, both Google and Apple will converge on ISO/CD 21496-1 and things will just start working. On Apple side as of iOS18 DB8, iOS still stores HDR in Apple format. On Google side keep a look at [libultrahdr](https://github.com/google/libultrahdr), which is most likely used in GPhotos backend.
+Hopefully, as Gainmap HDR matures, both Google and Apple will converge on ISO/CD 21496-1 and things will just start working. On Apple side as of iOS18 RC iPhone 15, iOS stores HDR in ISO "tmap" format. On Google side keep a look at [libultrahdr](https://github.com/google/libultrahdr), used in Android and also most likely in GPhotos backend.
 
 ## About
 
