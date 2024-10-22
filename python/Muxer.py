@@ -178,7 +178,7 @@ class Muxer:
 
     def mux(self):
         with exiftool.ExifToolHelper(
-            logger=None  # self.logger if self.verbose is True else None
+            logger=self.logger if self.verbose is True else None
         ) as et:
             image_metadata, video_metadata = et.get_metadata(
                 [self.image_fpath, self.video_fpath]
