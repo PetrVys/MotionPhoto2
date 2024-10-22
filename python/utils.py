@@ -38,9 +38,9 @@ def merge_bytes(
     video_size = len(video_bytes)
     if image_type == 'heic':
         # 8 - mpvd box size, 76 - size of full footer ($samsungTailStart + $videoOffset + $videoSize + $samsungTailEnd)
-        mpvd_size = video_size + 8 + 76
+        mpvd_size = video_size + const.MPVD_BOX_SIZE + const.SAMSUNG_TAIL_SIZE
         # 8 is the size of mpvd box
-        video_offset = image_size + 8
+        video_offset = image_size + const.MPVD_BOX_SIZE
     else:
         mpvd_size = 0
         video_offset = image_size
@@ -54,8 +54,8 @@ def merge_bytes(
         image_bytes += const.MPVD_BOX_NAME
 
     image_bytes += video_bytes
-    image_bytes += const.SAMUSING_TAIL_START
+    image_bytes += const.SAMSUNG_TAIL_START
     image_bytes += video_offset_bytes
     image_bytes += video_size_bytes
-    image_bytes += const.SAMUSING_TAIL_END
+    image_bytes += const.SAMSUNG_TAIL_END
     return image_bytes

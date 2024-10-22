@@ -94,7 +94,7 @@ class Muxer:
         self.delete_temp = delete_temp
         self.xmp = etree.fromstring(const.XMP)
 
-    def change_mimetype(self, mime: str, semantic: str = "Primary"):
+    def change_xmpresource(self, value: str, attribute: str = const.CONTAINER_MIME, semantic: str = "Primary"):
         directory = self.xmp.find(".//Container:Directory", const.NAMESPACES)
         seq = directory.find("rdf:Seq", const.NAMESPACES)
         records = seq.findall(".//rdf:li[@rdf:parseType='Resource']", const.NAMESPACES)
@@ -102,7 +102,7 @@ class Muxer:
             item = record.find("Container:Item", const.NAMESPACES)
             semantic_attrib = item.attrib[const.CONTAINER_SEMANTIC]
             if semantic_attrib == semantic:
-                item.set(const.CONTAINER_MIME, mime)
+                item.set(attribute, value)
 
     def __validate_extension(self, fpath, metadata: dict = None) -> str:
         extension = Path(fpath).suffix
@@ -131,7 +131,7 @@ class Muxer:
                     "Image extension %s not supported. Treating as JPG", extension
                 )
             image_type = "jpg"
-            self.change_mimetype("image/jpeg", semantic="Primary")
+            self.change_xmpresource("image/jpeg", semantic="Primary")
         return image_type
 
     def validate_video(self, fpath: str, metadata: dict = None) -> str:
@@ -141,7 +141,7 @@ class Muxer:
 
         if extension.lower() == ".mp4":
             video_type = "mp4"
-            self.change_mimetype("video/mp4", semantic="MotionPhoto")
+            self.change_xmpresource("video/mp4", semantic="MotionPhoto")
         else:
             if extension.lower() != ".mov":
                 self.logger.warning(
@@ -175,6 +175,9 @@ class Muxer:
             if child.tag != const.CONTAINER_DIRECTORY:
                 self.logger.info("Going to append %s", child)
                 self.xmp.find(".//rdf:Description", const.NAMESPACES).append(child)
+        for attr in xmp_description.attrib:
+            self.logger.info("Going to append attribute %s", attr)
+            self.xmp.find(".//rdf:Description", const.NAMESPACES).attrib[attr] = xmp_description.attrib.get(attr)
 
     def mux(self):
         with exiftool.ExifToolHelper(
@@ -183,6 +186,9 @@ class Muxer:
             image_metadata, video_metadata = et.get_metadata(
                 [self.image_fpath, self.video_fpath]
             )
+            
+            for ns in const.NAMESPACES:
+                etree.register_namespace(ns, const.NAMESPACES[ns])
 
             image_type = self.validate_image(self.image_fpath, metadata=image_metadata)
             self.fix_output_fpath(image_metadata)
@@ -209,15 +215,20 @@ class Muxer:
                 const.GCAMER_TIMESTAMP_US,
                 str(track_duration),
             )
+            
+            video_data = read_file(self.video_fpath)
+            video_length = len(video_data) + const.SAMSUNG_TAIL_SIZE
+            
+            self.change_xmpresource(str(video_length), attribute=const.CONTAINER_LENGTH, semantic="MotionPhoto")
 
             result = et.execute(*["-XMP", "-b", f"{self.image_fpath}"])
             if result == "":
                 self.logger.warning("XMP of original file is empty")
             else:
                 self.merge_xmp(result)
-
-            xpm_updated = self.output_fpath + ".XMP"
-            with open(xpm_updated, "wb") as f:
+                
+            xmp_updated = self.output_fpath + ".XMP"
+            with open(xmp_updated, "wb") as f:
                 f.write(etree.tostring(self.xmp, pretty_print=True))
 
             xmp_image = enrich_fname(self.output_fpath, "XMP")
@@ -226,14 +237,14 @@ class Muxer:
                 *[
                     "-overwrite_original",
                     "-tagsfromfile",
-                    xpm_updated,
+                    xmp_updated,
                     "-xmp",
                     xmp_image,
                 ]
             )
 
             merged_bytes = merge_bytes(
-                read_file(xmp_image), read_file(self.video_fpath), image_type=image_type
+                read_file(xmp_image), video_data, image_type=image_type
             )
 
             with open(self.output_fpath, "wb") as binary_file:
@@ -241,8 +252,8 @@ class Muxer:
             self.logger.info("Writing output file: %s", self.output_fpath)
 
             if self.delete_temp is True:
-                os.remove(xpm_updated)
-                self.logger.debug("Delete: %s", xpm_updated)
+                os.remove(xmp_updated)
+                self.logger.debug("Delete: %s", xmp_updated)
                 os.remove(xmp_image)
                 self.logger.debug("Delete: %s", xmp_image)
 
