@@ -12,10 +12,10 @@ from utils import (
     extract_track_duration,
     read_file,
     enrich_fname,
-    merge_bytes,
 )
 
 import constants as const
+from Samsung import Samsung
 
 logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
@@ -173,10 +173,10 @@ class Muxer:
         for child in xmp_description:
             # Just in case there are already MotionPhoto data, do not duplicate the Directory attribute
             if child.tag != const.CONTAINER_DIRECTORY:
-                self.logger.info("Going to append %s", child)
+                self.logger.info("XMP metadata - copying %s", child)
                 self.xmp.find(".//rdf:Description", const.NAMESPACES).append(child)
         for attr in xmp_description.attrib:
-            self.logger.info("Going to append attribute %s", attr)
+            self.logger.info("XMP metadata - copying attribute %s", attr)
             self.xmp.find(".//rdf:Description", const.NAMESPACES).attrib[attr] = xmp_description.attrib.get(attr)
 
     def mux(self):
@@ -206,10 +206,10 @@ class Muxer:
             )
 
             track_number = extract_track_number(result)
-            self.logger.info("Track number: %s", track_number)
+            self.logger.info("Live Photo keyframe track number: %s", track_number)
 
             track_duration = extract_track_duration(track_number, result)
-            self.logger.info("Track duration: %s", track_duration)
+            self.logger.info("Live Photo keyframe: %sus", track_duration)
 
             self.xmp.find(".//rdf:Description", const.NAMESPACES).set(
                 const.GCAMER_TIMESTAMP_US,
@@ -217,9 +217,10 @@ class Muxer:
             )
             
             video_data = read_file(self.video_fpath)
-            video_length = len(video_data) + const.SAMSUNG_TAIL_SIZE
+            samsung_tail = Samsung(video_data, image_type)
             
-            self.change_xmpresource(str(video_length), attribute=const.CONTAINER_LENGTH, semantic="MotionPhoto")
+            self.change_xmpresource(str(samsung_tail.get_video_size()), attribute=const.CONTAINER_LENGTH, semantic="MotionPhoto")
+            self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.CONTAINER_PADDING, semantic="Primary")
 
             result = et.execute(*["-XMP", "-b", f"{self.image_fpath}"])
             if result == "":
@@ -242,10 +243,11 @@ class Muxer:
                     xmp_image,
                 ]
             )
-
-            merged_bytes = merge_bytes(
-                read_file(xmp_image), video_data, image_type=image_type
-            )
+            
+            merged_bytes = read_file(xmp_image)
+            samsung_tail.set_image_size(len(merged_bytes))
+            video_footer = samsung_tail.video_footer()
+            merged_bytes += video_footer
 
             with open(self.output_fpath, "wb") as binary_file:
                 binary_file.write(merged_bytes)

@@ -30,32 +30,3 @@ def enrich_fname(fpath: str, enrich: str) -> str:
     fname = f"{p.stem}.{enrich}{p.suffix}"
     return os.path.join(p.parent, fname)
 
-
-def merge_bytes(
-    image_bytes: bytes, video_bytes: bytes, image_type: str = "heic"
-) -> bytes:
-    image_size = len(image_bytes)
-    video_size = len(video_bytes)
-    if image_type == 'heic':
-        # 8 - mpvd box size, 76 - size of full footer ($samsungTailStart + $videoOffset + $videoSize + $samsungTailEnd)
-        mpvd_size = video_size + const.MPVD_BOX_SIZE + const.SAMSUNG_TAIL_SIZE
-        # 8 is the size of mpvd box
-        video_offset = image_size + const.MPVD_BOX_SIZE
-    else:
-        mpvd_size = 0
-        video_offset = image_size
-
-    mpvd_size_bytes = struct.pack(">i", mpvd_size)
-    video_offset_bytes = struct.pack( ">i", video_offset)
-    video_size_bytes = struct.pack(">i", video_size)
-
-    if image_type == "heic":
-        image_bytes += mpvd_size_bytes
-        image_bytes += const.MPVD_BOX_NAME
-
-    image_bytes += video_bytes
-    image_bytes += const.SAMSUNG_TAIL_START
-    image_bytes += video_offset_bytes
-    image_bytes += video_size_bytes
-    image_bytes += const.SAMSUNG_TAIL_END
-    return image_bytes
