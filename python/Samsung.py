@@ -64,7 +64,7 @@ class Samsung:
                 tag_lengths[tag] = tag_length
                 for preceding_tag in const.SAMSUNG_TAG_IDS:
                     if preceding_tag in self.tags:
-                        tag_offsets[preceding_tag] = tag_offsets[preceding_tag] + tag_length if preceding_tag in tag_offsets else tag_length
+                        tag_offsets[preceding_tag] = tag_length + (tag_offsets[preceding_tag] if preceding_tag in tag_offsets else 0)
                         if preceding_tag == tag:
                             break
 
