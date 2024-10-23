@@ -1,6 +1,6 @@
 ## Installation
 
-Please make sure to have ExifTool [ExifTool](https://exiftool.org/) installed on your computer.
+Please make sure to have [ExifTool](https://exiftool.org/) installed on your computer.
 
 Install dependeces `pip install -r requirements.txt`
 
