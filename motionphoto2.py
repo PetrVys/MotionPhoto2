@@ -82,7 +82,11 @@ if __name__ == "__main__":
     if args.input_directory is not None:
         input_directory = f"{Path(args.input_directory).resolve()}"
         # Going to search couples of file with ext (".heic", ".heif", ".avif", ".jpg", ".jpeg") (".mp4", ".mov")
-        files = os.listdir(input_directory)
+        files = [
+            os.path.join(Path(pathv).relative_to(input_directory), file)
+            for pathv, directories, files in os.walk(input_directory)
+            for file in files
+        ]
         videos = [
             f
             for f in files
@@ -97,18 +101,24 @@ if __name__ == "__main__":
         ]
 
         for image in images:
-            fname = Path(image).stem
+            fname = f"{Path(image).with_suffix("")}"
             for ext in [".mp4", ".mov", ".MP4", ".MOV"]:
                 if fname + ext in videos:
                     video = videos.pop(videos.index(fname + ext))
 
                     input_image = os.path.join(input_directory, image)
                     input_video = os.path.join(input_directory, video)
+                    
+                    output_subdirectory = args.output_directory                   
+                    if output_subdirectory is not None:
+                        output_subdirectory = f"{Path(os.path.join(output_subdirectory, os.path.dirname(fname))).resolve()}"
+                        if os.path.exists(output_subdirectory) is False:
+                            os.makedirs(output_subdirectory)
 
                     Muxer(
                         image_fpath=input_image,
                         video_fpath=input_video,
-                        output_directory=args.output_directory,
+                        output_directory=output_subdirectory,
                         delete_video=args.delete_video,
                         delete_temp=not args.keep_temp,
                         overwrite=args.overwrite,
