@@ -112,6 +112,7 @@ if __name__ == "__main__":
                         overwrite=args.overwrite,
                         verbose=args.verbose,
                     ).mux()
+                    print("=" * 25)
                     break
     else:
         Muxer(

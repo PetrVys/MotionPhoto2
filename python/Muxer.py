@@ -68,7 +68,7 @@ class Muxer:
             self.logger.error("Output file cannot be use overwrite option")
             sys.exit(1)
 
-        if output_fpath is not None and self.output_directory is None:
+        if output_fpath is not None and self.output_directory is not None:
             self.logger.error("Output file cannot be use with output directory")
             sys.exit(1)
 
