@@ -77,4 +77,4 @@ Google official documentation of the format
 Samsung trailer tags are well explained in doodspav's repo
 - https://github.com/doodspav/motionphoto
 
-HEIC muxing is similar to doodspav's work, but additionally uses MP4 top-level boxes "mpvd" and "sefd" to add the MP data into heic and mp4 in stnadard-compliant way (see source here).
+HEIC muxing is similar to doodspav's work, but additionally uses MP4 top-level boxes "mpvd" and "sefd" to add the MP data into heic and mp4 in standard-compliant way (see source in this repo).
