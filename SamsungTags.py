@@ -4,7 +4,7 @@ import struct
 
 import constants as const
 
-class Samsung:
+class SamsungTags:
     
     # This class is responsible for creating the video footer that is attached after image data
     # It also creates offsets for the XMP image/video in the main image. 

@@ -15,7 +15,7 @@ from utils import (
 )
 
 import constants as const
-from Samsung import Samsung
+from SamsungTags import SamsungTags
 
 logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
@@ -217,7 +217,7 @@ class Muxer:
             )
             
             video_data = read_file(self.video_fpath)
-            samsung_tail = Samsung(video_data, image_type)
+            samsung_tail = SamsungTags(video_data, image_type)
             
             self.change_xmpresource(str(samsung_tail.get_video_size()), attribute=const.CONTAINER_LENGTH, semantic="MotionPhoto")
             self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.CONTAINER_PADDING, semantic="Primary")
