@@ -22,7 +22,10 @@ Both Python and ExifTool should be in your package managers or installed already
 
 ### Dependencies
 
-Once you have Python and ExifTool installed on your OS, navigate to the script's directory and run `pip install -r requirements.txt`
+Once you have Python and ExifTool installed on your OS, navigate to the script's directory and run 
+```
+> pip install -r requirements.txt
+```
 
 ## Usage
 
@@ -37,7 +40,7 @@ To convert image and video pair to Motion Photo v2, run:
 ### Directory mode
 The script will automatically search file in directory that have the same name but different extension, for example: IMG_1496.HEIC, IMG_1496.MP4
 ```
-> python nmotionphoto2.py --input-directory /your/directory
+> python motionphoto2.py --input-directory /your/directory
 ```
 
 ### Notes
