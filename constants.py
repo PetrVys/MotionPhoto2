@@ -50,10 +50,10 @@ NAMESPACES = {
 }
 
 CONTAINER_DIRECTORY = "{" + NAMESPACES["Container"] + "}Directory"
-CONTAINER_SEMANTIC = "{" + NAMESPACES["Container"] + "item/}Semantic"
-CONTAINER_MIME = "{" + NAMESPACES["Container"] + "item/}Mime"
-CONTAINER_LENGTH = "{" + NAMESPACES["Container"] + "item/}Length"
-CONTAINER_PADDING = "{" + NAMESPACES["Container"] + "item/}Padding"
+ITEM_SEMANTIC = "{" + NAMESPACES["Item"] + "}Semantic"
+ITEM_MIME = "{" + NAMESPACES["Item"] + "}Mime"
+ITEM_LENGTH = "{" + NAMESPACES["Item"] + "}Length"
+ITEM_PADDING = "{" + NAMESPACES["Item"] + "}Padding"
 GCAMER_TIMESTAMP_US = "{" + NAMESPACES["GCamera"] + "}MotionPhotoPresentationTimestampUs"
 
 MPVD_BOX_SIZE = 8

@@ -94,13 +94,13 @@ class Muxer:
         self.delete_temp = delete_temp
         self.xmp = etree.fromstring(const.XMP)
 
-    def change_xmpresource(self, value: str, attribute: str = const.CONTAINER_MIME, semantic: str = "Primary"):
+    def change_xmpresource(self, value: str, attribute: str = const.ITEM_MIME, semantic: str = "Primary"):
         directory = self.xmp.find(".//Container:Directory", const.NAMESPACES)
         seq = directory.find("rdf:Seq", const.NAMESPACES)
         records = seq.findall(".//rdf:li[@rdf:parseType='Resource']", const.NAMESPACES)
         for record in records:
             item = record.find("Container:Item", const.NAMESPACES)
-            semantic_attrib = item.attrib[const.CONTAINER_SEMANTIC]
+            semantic_attrib = item.attrib[const.ITEM_SEMANTIC]
             if semantic_attrib == semantic:
                 item.set(attribute, value)
 
@@ -237,8 +237,8 @@ class Muxer:
             else:
                 self.merge_xmp(result)
                 
-            self.change_xmpresource(str(samsung_tail.get_video_size()), attribute=const.CONTAINER_LENGTH, semantic="MotionPhoto")
-            self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.CONTAINER_PADDING, semantic="Primary")
+            self.change_xmpresource(str(samsung_tail.get_video_size()), attribute=const.ITEM_LENGTH, semantic="MotionPhoto")
+            self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.ITEM_PADDING, semantic="Primary")
 
             xmp_updated = self.output_fpath + ".XMP"
             with open(xmp_updated, "wb") as f:
