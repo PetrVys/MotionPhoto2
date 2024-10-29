@@ -80,6 +80,8 @@ if __name__ == "__main__":
             os.mkdir(output_directory)
 
     if args.input_directory is not None:
+        print (f"Converting files in {args.input_directory}")
+        print("=" * 25)
         input_directory = f"{Path(args.input_directory).resolve()}"
         # Going to search couples of file with ext (".heic", ".heif", ".avif", ".jpg", ".jpeg") (".mp4", ".mov")
         files = [
@@ -88,22 +90,22 @@ if __name__ == "__main__":
             for file in files
         ]
         videos = [
-            f
+            f"{Path(f)}"
             for f in files
             if os.path.isfile(os.path.join(input_directory, f))
             and Path(f).suffix.lower() in [".mp4", ".mov"]
         ]
         images = [
-            f
+            f"{Path(f)}"
             for f in files
             if os.path.isfile(os.path.join(input_directory, f))
             and Path(f).suffix.lower() in [".heic", ".heif", ".avif", ".jpg", ".jpeg"]
         ]
-
+        
         for image in images:
             fname = f"{Path(image).with_suffix("")}"
             for ext in [".mp4", ".mov", ".MP4", ".MOV"]:
-                if fname + ext in videos:
+                if f"{Path(fname).with_suffix(ext)}" in videos:
                     video = videos.pop(videos.index(fname + ext))
 
                     input_image = os.path.join(input_directory, image)
@@ -114,7 +116,7 @@ if __name__ == "__main__":
                         output_subdirectory = f"{Path(os.path.join(output_subdirectory, os.path.dirname(fname))).resolve()}"
                         if os.path.exists(output_subdirectory) is False:
                             os.makedirs(output_subdirectory)
-
+                    
                     Muxer(
                         image_fpath=input_image,
                         video_fpath=input_video,

@@ -180,7 +180,9 @@ class Muxer:
             self.xmp.find(".//rdf:Description", const.NAMESPACES).attrib[attr] = xmp_description.attrib.get(attr)
 
     def mux(self):
+        self.logger.info("Processing %s", self.image_fpath)
         with exiftool.ExifToolHelper(
+            encoding="utf-8",
             logger=self.logger if self.verbose is True else None
         ) as et:
             image_metadata, video_metadata = et.get_metadata(
