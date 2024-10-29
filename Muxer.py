@@ -181,6 +181,12 @@ class Muxer:
 
     def mux(self):
         self.logger.info("Processing %s", self.image_fpath)
+
+	# Add script directory to PATH in case it contains exiftool.exe - useful for packaging, since script path will not be argv[0] nor current directory.
+        exiftool_path = Path(__file__).parent.resolve() / "exiftool.exe"
+        if exiftool_path.is_file():
+            os.environ["PATH"] += os.pathsep + f"{Path(__file__).parent.resolve()}"
+            
         with exiftool.ExifToolHelper(
             encoding="utf-8",
             logger=self.logger if self.verbose is True else None
@@ -225,15 +231,15 @@ class Muxer:
             video_data = read_file(self.video_fpath)
             samsung_tail = SamsungTags(video_data, image_type)
             
-            self.change_xmpresource(str(samsung_tail.get_video_size()), attribute=const.CONTAINER_LENGTH, semantic="MotionPhoto")
-            self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.CONTAINER_PADDING, semantic="Primary")
-
             result = et.execute(*["-XMP", "-b", f"{self.image_fpath}"])
             if result == "":
                 self.logger.warning("XMP of original file is empty")
             else:
                 self.merge_xmp(result)
                 
+            self.change_xmpresource(str(samsung_tail.get_video_size()), attribute=const.CONTAINER_LENGTH, semantic="MotionPhoto")
+            self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.CONTAINER_PADDING, semantic="Primary")
+
             xmp_updated = self.output_fpath + ".XMP"
             with open(xmp_updated, "wb") as f:
                 f.write(etree.tostring(self.xmp, pretty_print=True))
