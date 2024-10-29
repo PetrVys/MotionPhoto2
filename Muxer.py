@@ -204,18 +204,22 @@ class Muxer:
                     f"{self.video_fpath}",
                 ]
             )
-
-            track_number = extract_track_number(result)
-            self.logger.info("Live Photo keyframe track number: %s", track_number)
-
-            track_duration = extract_track_duration(track_number, result)
-            self.logger.info("Live Photo keyframe: %sus", track_duration)
-
-            self.xmp.find(".//rdf:Description", const.NAMESPACES).set(
-                const.GCAMER_TIMESTAMP_US,
-                str(track_duration),
-            )
             
+            try:
+                track_number = extract_track_number(result)
+                self.logger.info("Live Photo keyframe track number: %s", track_number)
+
+                track_duration = extract_track_duration(track_number, result)
+                self.logger.info("Live Photo keyframe: %sus", track_duration)
+                
+                self.xmp.find(".//rdf:Description", const.NAMESPACES).set(
+                    const.GCAMER_TIMESTAMP_US,
+                    str(track_duration),
+                )
+            except:
+                track_duration = -1
+                self.logger.info("Could not read Live Photo keyframe (source video is probably not from Live Photo). No keyframe will be set.")
+
             video_data = read_file(self.video_fpath)
             samsung_tail = SamsungTags(video_data, image_type)
             
