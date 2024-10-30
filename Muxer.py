@@ -168,16 +168,19 @@ class Muxer:
                 )
 
     def merge_xmp(self, xmp: str):
-        xmp = etree.fromstring(xmp)
-        xmp_description = xmp.find(".//rdf:Description", const.NAMESPACES)
-        for child in xmp_description:
-            # Just in case there are already MotionPhoto data, do not duplicate the Directory attribute
-            if child.tag != const.CONTAINER_DIRECTORY:
-                self.logger.info("XMP metadata - copying %s", child)
-                self.xmp.find(".//rdf:Description", const.NAMESPACES).append(child)
-        for attr in xmp_description.attrib:
-            self.logger.info("XMP metadata - copying attribute %s", attr)
-            self.xmp.find(".//rdf:Description", const.NAMESPACES).attrib[attr] = xmp_description.attrib.get(attr)
+        try:
+            xmp = etree.fromstring(xmp)
+            xmp_description = xmp.find(".//rdf:Description", const.NAMESPACES)
+            for child in xmp_description:
+                # Just in case there are already MotionPhoto data, do not duplicate the Directory attribute
+                if child.tag != const.CONTAINER_DIRECTORY:
+                    self.logger.info("XMP metadata - copying %s", child)
+                    self.xmp.find(".//rdf:Description", const.NAMESPACES).append(child)
+            for attr in xmp_description.attrib:
+                self.logger.info("XMP metadata - copying attribute %s", attr)
+                self.xmp.find(".//rdf:Description", const.NAMESPACES).attrib[attr] = xmp_description.attrib.get(attr)
+        except:
+            self.logger.info("Could not copy (some of?) the XMP metadata tags from source.")
 
     def mux(self):
         self.logger.info("Processing %s", self.image_fpath)
