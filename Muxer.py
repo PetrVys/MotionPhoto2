@@ -264,9 +264,10 @@ class Muxer:
             video_footer = samsung_tail.video_footer()
             merged_bytes += video_footer
 
+            self.logger.info("Writing output file: %s", self.output_fpath)
             with open(self.output_fpath, "wb") as binary_file:
                 binary_file.write(merged_bytes)
-            self.logger.info("Writing output file: %s", self.output_fpath)
+            shutil.copystat(self.image_fpath, self.output_fpath)
 
             if self.delete_temp is True:
                 os.remove(xmp_updated)
