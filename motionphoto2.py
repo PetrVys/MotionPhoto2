@@ -3,10 +3,19 @@
 import argparse
 import sys
 import os
+import exiftool
+import logging
 
 from pathlib import Path
 
 from Muxer import Muxer
+
+logging.basicConfig(
+    handlers=[logging.StreamHandler(sys.stdout)],
+    level=logging.DEBUG,
+    format="[%(asctime)s] [%(levelname)s] [%(name)s] - %(message)s",
+    datefmt="%d/%m/%Y %H:%M:%S"
+)
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
@@ -84,66 +93,76 @@ if __name__ == "__main__":
         output_directory = f"{Path(args.output_directory).resolve()}"
         if os.path.exists(output_directory) is False:
             os.mkdir(output_directory)
+            
+    logger = logging.getLogger("ExifTool")
+    logger.setLevel(logging.DEBUG if args.verbose else logging.INFO)
+    
+    with exiftool.ExifToolHelper(
+        encoding="utf-8",
+        logger=logger if args.verbose is True else None
+    ) as et:
 
-    if args.input_directory is not None:
-        print (f"Converting files in {args.input_directory}")
-        print("=" * 25)
-        input_directory = f"{Path(args.input_directory).resolve()}"
-        # Going to search couples of file with ext (".heic", ".heif", ".avif", ".jpg", ".jpeg") (".mp4", ".mov")
-        files = [
-            os.path.join(Path(pathv).relative_to(input_directory), file)
-            for pathv, directories, files in os.walk(input_directory)
-            for file in files
-        ]
-        videos = [
-            f"{Path(f)}"
-            for f in files
-            if os.path.isfile(os.path.join(input_directory, f))
-            and Path(f).suffix.lower() in [".mp4", ".mov"]
-        ]
-        images = [
-            f"{Path(f)}"
-            for f in files
-            if os.path.isfile(os.path.join(input_directory, f))
-            and Path(f).suffix.lower() in [".heic", ".heif", ".avif", ".jpg", ".jpeg"]
-        ]
-        
-        for image in images:
-            fname = f"{Path(image).with_suffix("")}"
-            for ext in [".mp4", ".mov", ".MP4", ".MOV"]:
-                if f"{Path(fname).with_suffix(ext)}" in videos:
-                    video = videos.pop(videos.index(fname + ext))
+        if args.input_directory is not None:
+            print (f"Converting files in {args.input_directory}")
+            print("=" * 25)
+            input_directory = f"{Path(args.input_directory).resolve()}"
+            # Going to search couples of file with ext (".heic", ".heif", ".avif", ".jpg", ".jpeg") (".mp4", ".mov")
+            files = [
+                os.path.join(Path(pathv).relative_to(input_directory), file)
+                for pathv, directories, files in os.walk(input_directory)
+                for file in files
+            ]
+            videos = [
+                f"{Path(f)}"
+                for f in files
+                if os.path.isfile(os.path.join(input_directory, f))
+                and Path(f).suffix.lower() in [".mp4", ".mov"]
+            ]
+            images = [
+                f"{Path(f)}"
+                for f in files
+                if os.path.isfile(os.path.join(input_directory, f))
+                and Path(f).suffix.lower() in [".heic", ".heif", ".avif", ".jpg", ".jpeg"]
+            ]
+            
+            for image in images:
+                fname = f"{Path(image).with_suffix("")}"
+                for ext in [".mp4", ".mov", ".MP4", ".MOV"]:
+                    if f"{Path(fname).with_suffix(ext)}" in videos:
+                        video = videos.pop(videos.index(fname + ext))
 
-                    input_image = os.path.join(input_directory, image)
-                    input_video = os.path.join(input_directory, video)
-                    
-                    output_subdirectory = args.output_directory                   
-                    if output_subdirectory is not None:
-                        output_subdirectory = f"{Path(os.path.join(output_subdirectory, os.path.dirname(fname))).resolve()}"
-                        if os.path.exists(output_subdirectory) is False:
-                            os.makedirs(output_subdirectory)
-                    
-                    Muxer(
-                        image_fpath=input_image,
-                        video_fpath=input_video,
-                        output_directory=output_subdirectory,
-                        delete_video=args.delete_video,
-                        delete_temp=not args.keep_temp,
-                        overwrite=args.overwrite,
-                        no_xmp=args.no_xmp,
-                        verbose=args.verbose,
-                    ).mux()
-                    print("=" * 25)
-                    break
-    else:
-        Muxer(
-            image_fpath=args.input_image,
-            video_fpath=args.input_video,
-            output_fpath=args.output_file,
-            output_directory=args.output_directory,
-            delete_video=args.delete_video,
-            delete_temp=not args.keep_temp,
-            overwrite=args.overwrite,
-            no_xmp=args.no_xmp,
-            verbose=args.verbose,
-        ).mux()
+                        input_image = os.path.join(input_directory, image)
+                        input_video = os.path.join(input_directory, video)
+                        
+                        output_subdirectory = args.output_directory                   
+                        if output_subdirectory is not None:
+                            output_subdirectory = f"{Path(os.path.join(output_subdirectory, os.path.dirname(fname))).resolve()}"
+                            if os.path.exists(output_subdirectory) is False:
+                                os.makedirs(output_subdirectory)
+                        
+                        Muxer(
+                            image_fpath=input_image,
+                            video_fpath=input_video,
+                            exiftool=et,
+                            output_directory=output_subdirectory,
+                            delete_video=args.delete_video,
+                            delete_temp=not args.keep_temp,
+                            overwrite=args.overwrite,
+                            no_xmp=args.no_xmp,
+                            verbose=args.verbose,
+                        ).mux()
+                        print("=" * 25)
+                        break
+        else:
+            Muxer(
+                image_fpath=args.input_image,
+                video_fpath=args.input_video,
+                exiftool=et,
+                output_fpath=args.output_file,
+                output_directory=args.output_directory,
+                delete_video=args.delete_video,
+                delete_temp=not args.keep_temp,
+                overwrite=args.overwrite,
+                no_xmp=args.no_xmp,
+                verbose=args.verbose,
+            ).mux()
