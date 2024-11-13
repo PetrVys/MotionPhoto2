@@ -34,6 +34,7 @@ class Muxer:
         delete_video: bool = False,
         delete_temp: bool = True,
         overwrite: bool = False,
+        no_xmp: bool = False,
         verbose: bool = False,
     ):
         self.logger = logging.getLogger(Path(image_fpath).stem)
@@ -48,6 +49,7 @@ class Muxer:
         self.output_directory = output_directory
         self.overwrite = overwrite
         self.delete_video = delete_video
+        self.no_xmp = no_xmp
 
         if os.path.isfile(self.image_fpath) is False:
             self.logger.error("Image file doesn't exist")
@@ -205,61 +207,66 @@ class Muxer:
             self.fix_output_fpath(image_metadata)
             self.validate_video(self.video_fpath, metadata=video_metadata)
 
-            result = et.execute(
-                *[
-                    "-X",
-                    "-ee",
-                    "-n",
-                    "-QuickTime:StillImageTime",
-                    "-QuickTime:TrackDuration",
-                    f"{self.video_fpath}",
-                ]
-            )
-            
-            try:
-                track_number = extract_track_number(result)
-                self.logger.info("Live Photo keyframe track number: %s", track_number)
-
-                track_duration = extract_track_duration(track_number, result)
-                self.logger.info("Live Photo keyframe: %sus", track_duration)
-                
-                self.xmp.find(".//rdf:Description", const.NAMESPACES).set(
-                    const.GCAMER_TIMESTAMP_US,
-                    str(track_duration),
+            if self.no_xmp is False:
+                result = et.execute(
+                    *[
+                        "-X",
+                        "-ee",
+                        "-n",
+                        "-QuickTime:StillImageTime",
+                        "-QuickTime:TrackDuration",
+                        f"{self.video_fpath}",
+                    ]
                 )
-            except:
-                track_duration = -1
-                self.logger.info("Could not read Live Photo keyframe (source video is probably not from Live Photo). No keyframe will be set.")
-
-            video_data = read_file(self.video_fpath)
-            samsung_tail = SamsungTags(video_data, image_type)
-            
-            result = et.execute(*["-XMP", "-b", f"{self.image_fpath}"])
-            if result == "":
-                self.logger.warning("XMP of original file is empty")
-            else:
-                self.merge_xmp(result)
                 
-            self.change_xmpresource(str(samsung_tail.get_video_size()), attribute=const.ITEM_LENGTH, semantic="MotionPhoto")
-            self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.ITEM_PADDING, semantic="Primary")
+                try:
+                    track_number = extract_track_number(result)
+                    self.logger.info("Live Photo keyframe track number: %s", track_number)
 
-            xmp_updated = self.output_fpath + ".XMP"
-            with open(xmp_updated, "wb") as f:
-                f.write(etree.tostring(self.xmp, pretty_print=True))
+                    track_duration = extract_track_duration(track_number, result)
+                    self.logger.info("Live Photo keyframe: %sus", track_duration)
+                    
+                    self.xmp.find(".//rdf:Description", const.NAMESPACES).set(
+                        const.GCAMER_TIMESTAMP_US,
+                        str(track_duration),
+                    )
+                except:
+                    track_duration = -1
+                    self.logger.info("Could not read Live Photo keyframe (source video is probably not from Live Photo). No keyframe will be set.")
 
-            xmp_image = enrich_fname(self.output_fpath, "XMP")
-            shutil.copyfile(self.image_fpath, xmp_image)
-            et.execute(
-                *[
-                    "-overwrite_original",
-                    "-tagsfromfile",
-                    xmp_updated,
-                    "-xmp",
-                    xmp_image,
-                ]
-            )
-            
-            merged_bytes = read_file(xmp_image)
+                video_data = read_file(self.video_fpath)
+                samsung_tail = SamsungTags(video_data, image_type)
+                
+                result = et.execute(*["-XMP", "-b", f"{self.image_fpath}"])
+                if result == "":
+                    self.logger.warning("XMP of original file is empty")
+                else:
+                    self.merge_xmp(result)
+                    
+                self.change_xmpresource(str(samsung_tail.get_video_size()), attribute=const.ITEM_LENGTH, semantic="MotionPhoto")
+                self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.ITEM_PADDING, semantic="Primary")
+
+                xmp_updated = self.output_fpath + ".XMP"
+                with open(xmp_updated, "wb") as f:
+                    f.write(etree.tostring(self.xmp, pretty_print=True))
+
+                xmp_image = enrich_fname(self.output_fpath, "XMP")
+                shutil.copyfile(self.image_fpath, xmp_image)
+                et.execute(
+                    *[
+                        "-overwrite_original",
+                        "-tagsfromfile",
+                        xmp_updated,
+                        "-xmp",
+                        xmp_image,
+                    ]
+                )
+                
+                merged_bytes = read_file(xmp_image)
+            else:
+                video_data = read_file(self.video_fpath)
+                samsung_tail = SamsungTags(video_data, image_type)
+                merged_bytes = read_file(self.image_fpath)
             samsung_tail.set_image_size(len(merged_bytes))
             video_footer = samsung_tail.video_footer()
             merged_bytes += video_footer

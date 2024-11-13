@@ -40,6 +40,12 @@ if __name__ == "__main__":
         help="Keep temp file used during muxing",
     )
     parser.add_argument(
+        "-nx",
+        "--no-xmp",
+        action="store_true",
+        help="No XMP processing (just glue image and video using Samsung tags)",
+    )
+    parser.add_argument(
         "-o",
         "--overwrite",
         action="store_true",
@@ -124,6 +130,7 @@ if __name__ == "__main__":
                         delete_video=args.delete_video,
                         delete_temp=not args.keep_temp,
                         overwrite=args.overwrite,
+                        no_xmp=args.no_xmp,
                         verbose=args.verbose,
                     ).mux()
                     print("=" * 25)
@@ -137,5 +144,6 @@ if __name__ == "__main__":
             delete_video=args.delete_video,
             delete_temp=not args.keep_temp,
             overwrite=args.overwrite,
+            no_xmp=args.no_xmp,
             verbose=args.verbose,
         ).mux()
