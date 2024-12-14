@@ -22,7 +22,8 @@ Both Python and ExifTool should be in your package managers or installed already
 
 ### Dependencies
 
-Once you have Python and ExifTool installed on your OS, navigate to the script's directory and run 
+Once you have Python and ExifTool installed on your OS, navigate to the script's directory and run
+
 ```
 > pip install -r requirements.txt
 ```
@@ -38,12 +39,21 @@ To convert image and video pair to Motion Photo v2, run:
 ```
 
 ### Directory mode
+
 The script will automatically search file in directory that have the same name but different extension, for example: IMG_1496.HEIC, IMG_1496.MP4
+
 ```
 > python motionphoto2.py --input-directory /your/directory
 ```
 
+By default, only files in the specified directory are processed. To recursively process all subdirectories, use the `-r` or `--recursive` flag:
+
+```
+> python motionphoto2.py --input-directory /your/directory --recursive
+```
+
 ### Notes
+
 - The output of new images file will be: original_name.**LIVE**.ext
 - If you provide a `--output-directory` the file will be: **output-directory**/original_name.ext
 - While the script muxes the image and video two temp files will be created and deleted automatically, you can keep it with `--keep-temp`
@@ -56,7 +66,7 @@ If the source image is an Apple HDR HEIC image, Google Photos will say that the 
 
 Google Photos _will_ actually show it too, but only when it is stored in local photos on an iPhone/iPad.
 
-The reason is probably directly related to Motion Photos -  the same place where Motion Photos are defined (in XMP object GCamera - `http://ns.google.com/photos/1.0/camera/`) is also the place where Google/Android stores JPEG/R HDR information.
+The reason is probably directly related to Motion Photos - the same place where Motion Photos are defined (in XMP object GCamera - `http://ns.google.com/photos/1.0/camera/`) is also the place where Google/Android stores JPEG/R HDR information.
 
 It appears that the server-side processing of Google Photos does not check for Apple HDR once it finds Google Camera header in XMP tags. For JPG files, a conversion is possible by adjusting metadata and is on the roadmap. Unfortunately there is no support for Gainmap HDR HEIF images in libultrahdr or any modern Android devices at the moment.
 
@@ -68,13 +78,14 @@ Huge thanks to [@Tkd-Alex](https://github.com/Tkd-Alex) for porting the original
 
 Thanks to [@tribut](https://github.com/tribut), [@Tkd-Alex](https://github.com/Tkd-Alex), [@4Urban](https://github.com/4Urban), [@IamRysing](https://github.com/IamRysing) and [@NightMean](https://github.com/NightMean) for providing sample Motion Photo pictures (check them out [here](https://github.com/PetrVys/MotionPhotoSamples))
 
-
 #### Documentation
 
 Google official documentation of the format
+
 - https://developer.android.com/media/platform/motion-photo-format
 
 Samsung trailer tags are well explained in doodspav's repo
+
 - https://github.com/doodspav/motionphoto
 
 HEIC muxing is similar to doodspav's work, but additionally uses MP4 top-level boxes "mpvd" and "sefd" to add the MP data into heic and mp4 in standard-compliant way (see source in this repo).
