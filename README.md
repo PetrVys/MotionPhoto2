@@ -26,6 +26,8 @@ Once you have Python and ExifTool installed on your OS, navigate to the script's
 
 ## Usage
 
+Just run the script! If you run it without parameters, it'll present a GUI with explanations. Alternatively, you can use it using commandline as per below examples.
+
 ### Individual photos
 
 To convert image and video pair to Motion Photo v2, run:
