@@ -8,21 +8,17 @@ Photos are created to mimic the way Galaxy S23 Ultra and Tab S9 phones create HE
 
 ## Installation
 
-The script requires [ExifTool](https://exiftool.org/) and [Python 3.7+](https://www.python.org/) on your computer.
-
 ### Windows
 
 Please install ExifTool so that it is added to your path. The easiest is to use [installer by Oliver Betz](https://oliverbetz.de/pages/Artikel/ExifTool-for-Windows). Use the file "ExifTool_install_nn.nn_64.exe" and accept all defaults.
 
-For Python, please use [official installer](https://www.python.org/downloads/windows/) and make sure to check "Install pip" and "Add Python to environment variables" during installation.
+Then download the Windows release and enjoy!
 
 ### Unix and MacOS
 
-Both Python and ExifTool should be in your package managers or installed already.
+The script requires [ExifTool](https://exiftool.org/) and [Python 3.7+](https://www.python.org/) on your computer. Both Python and ExifTool should be in your package managers or installed already, please install them if you did not yet.
 
-### Dependencies
-
-Once you have Python and ExifTool installed on your OS, navigate to the script's directory and run
+Once you have Python and ExifTool installed on your OS, navigate to the script's directory and run following command to download script's dependencies
 
 ```
 > pip install -r requirements.txt
@@ -35,7 +31,7 @@ Once you have Python and ExifTool installed on your OS, navigate to the script's
 To convert image and video pair to Motion Photo v2, run:
 
 ```
-> python motionphoto2.py --input-image ImageFile.HEIC --input-video VideoFile.MP4
+> motionphoto2 --input-image ImageFile.HEIC --input-video VideoFile.MP4
 ```
 
 ### Directory mode
@@ -43,18 +39,13 @@ To convert image and video pair to Motion Photo v2, run:
 The script will automatically search file in directory that have the same name but different extension, for example: IMG_1496.HEIC, IMG_1496.MP4
 
 ```
-> python motionphoto2.py --input-directory /your/directory
-```
-
-By default, only files in the specified directory are processed. To recursively process all subdirectories, use the `-r` or `--recursive` flag:
-
-```
-> python motionphoto2.py --input-directory /your/directory --recursive
+> motionphoto2 --input-directory /your/directory
 ```
 
 ### Notes
 
 - The output of new images file will be: original_name.**LIVE**.ext
+- If you want to process recursively all subdirectories use: `--recursive`
 - If you provide a `--output-directory` the file will be: **output-directory**/original_name.ext
 - While the script muxes the image and video two temp files will be created and deleted automatically, you can keep it with `--keep-temp`
 - If you want to replace the original image file with the live one use: `--overwrite` (use at your risk)
