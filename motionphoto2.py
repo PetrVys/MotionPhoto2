@@ -7,6 +7,7 @@ import exiftool
 import logging
 
 from pathlib import Path
+from gooey import GooeyParser
 
 from Muxer import Muxer
 
@@ -17,56 +18,127 @@ logging.basicConfig(
     datefmt="%d/%m/%Y %H:%M:%S"
 )
 
-if __name__ == "__main__":
-    parser = argparse.ArgumentParser(
+def main():    
+    parser = GooeyParser(
         prog="MotionPhoto2",
         description="Mux HEIC and JPG Live Photos into Google/Samsung Motion Photos",
     )
-
-    parser.add_argument("-ii", "--input-image", help="Input file image (.heic, .jpg)")
-    parser.add_argument("-iv", "--input-video", help="Input file video (.mov, .mp4)")
-    parser.add_argument("-of", "--output-file", help="Output filename of Live Photos")
-
-    parser.add_argument(
-        "-id", "--input-directory", help="Mux all the photos and video in directory"
+    
+    dir_group = parser.add_argument_group(
+        "Process a Directory"
     )
-    parser.add_argument(
+
+    dir_group.add_argument(
+        "-id", 
+        "--input-directory", 
+        help="Mux all the photos and videos in a directory",
+        widget='DirChooser',
+        gooey_options={'full_width':True}
+    )
+    
+    dir_group.add_argument(
+        "-r",
+        "--recursive",
+        action="store_true",
+        help="Recursively process subdirectories in input_directory",
+        gooey_options={'initial_value':True}
+    )
+
+    dir_group.add_argument(
         "-od",
         "--output-directory",
-        help="Store all the Live Photos into dedicated directory",
+        help="Directory where to save the resulting Live Photos",
+        widget='DirChooser',
+        gooey_options={'full_width':True}
     )
 
-    parser.add_argument(
+    settings_group = parser.add_argument_group(
+        "Settings",
+        gooey_options={'columns':4}
+    )
+
+    settings_group.add_argument(
         "-dv",
         "--delete-video",
         action="store_true",
-        help="Automatically delete video after muxing",
+        help="Delete video after muxing",
     )
-    parser.add_argument(
+    
+    settings_group.add_argument(
+        "-o",
+        "--overwrite",
+        action="store_true",
+        help="Overwrite the original image",
+    )
+    
+    settings_group.add_argument(
         "-kt",
         "--keep-temp",
         action="store_true",
-        help="Keep temp file used during muxing",
+        help="Keep muxing temp files",
     )
-    parser.add_argument(
+    
+    settings_group.add_argument(
+        "-v", 
+        "--verbose", 
+        action="store_true", 
+        help="Verbose output"
+    )
+
+    file_group = parser.add_argument_group(
+        "Process a Single File"
+    )
+
+    file_group.add_argument(
+        "-ii",
+        "--input-image",
+        help="Input file image (.heic, .jpg)",
+        widget='FileChooser',
+        gooey_options={
+            'wildcard':
+                "HEIC file|*.heic|"
+                "HEIF file|*.heif|"
+                "JPG file|*.jpg|"
+                "All files (*.*)|*.*",
+            'message': "Select image file"
+        }
+    )
+        
+    file_group.add_argument(
+        "-iv",
+        "--input-video", 
+        help="Input file video (.mov, .mp4)", 
+        widget='FileChooser',
+        gooey_options={
+            'wildcard':
+                "MOV file|*.mov|"
+                "MP4 file|*.mp4|"
+                "All files (*.*)|*.*",
+            'message': "Select video file"
+        }
+    )
+
+    file_group.add_argument(
+        "-of", 
+        "--output-file", 
+        help="Output Live Photo filename",
+        widget='FileSaver',
+        gooey_options={
+            'wildcard':
+                "HEIC file|*.heic|"
+                "HEIF file|*.heif|"
+                "JPG file|*.jpg|"
+                "All files (*.*)|*.*",
+            'message': "Target image file"
+        }
+    )
+
+    file_group.add_argument(
         "-nx",
         "--no-xmp",
         action="store_true",
         help="No XMP processing (just glue image and video using Samsung tags)",
-    )
-    parser.add_argument(
-        "-o",
-        "--overwrite",
-        action="store_true",
-        help="Overwrite the original image file as output Live Photos",
-    )
-    parser.add_argument("-v", "--verbose", action="store_true", help="Verbose muxing")
-
-    parser.add_argument(
-        "-r",
-        "--recursive",
-        action="store_true",
-        help="Recursively process subdirectories when using input-directory",
+        gooey_options={'visible':False}
     )
 
     args = parser.parse_args()
@@ -90,12 +162,6 @@ if __name__ == "__main__":
         print("[ERROR] Output file cannot be use overwrite option")
         sys.exit(1)
 
-    if args.overwrite is True or args.delete_video is True:
-        text = f"[WARNING] Make sure to have a backup of your image and/or video file (overwrite={args.overwrite}, delete-video={args.delete_video})"
-        confirmation = input(f"{text}\nContinue? [Y/n] ")
-        if len(confirmation) > 0 and confirmation[0].lower() == "n":
-            sys.exit(1)
-
     if args.output_directory is not None:
         output_directory = f"{Path(args.output_directory).resolve()}"
         if os.path.exists(output_directory) is False:
@@ -111,7 +177,6 @@ if __name__ == "__main__":
 
         if args.input_directory is not None:
             print(f"Converting files in {args.input_directory}")
-            print("=" * 25)
             input_directory = Path(args.input_directory).resolve()
             
             # Get files based on recursive flag
@@ -140,7 +205,9 @@ if __name__ == "__main__":
                 if Path(f).suffix.lower() in [".heic", ".heif", ".avif", ".jpg", ".jpeg"]
             ]
             
+            i = 0
             for image in images:
+                i += 1
                 image_path = Path(image)
                 fname = str(image_path.with_suffix(''))
                 
@@ -154,6 +221,7 @@ if __name__ == "__main__":
                     for ext in [".mp4", ".mov", ".MP4", ".MOV"]:
                         video_fname = f"{Path(video_name).with_suffix(ext)}"
                         if video_fname in videos:
+                            print(f"=========================[{i}/{len(images)}]")
                             video = videos.pop(videos.index(video_fname))
 
                             # Construct full paths for input files
@@ -180,11 +248,11 @@ if __name__ == "__main__":
                                 no_xmp=args.no_xmp,
                                 verbose=args.verbose,
                             ).mux()
-                            print("=" * 25)
                             break
                     else:
                         continue
                     break
+            print("=" * 25)
         else:
             Muxer(
                 image_fpath=args.input_image,
@@ -198,3 +266,19 @@ if __name__ == "__main__":
                 no_xmp=args.no_xmp,
                 verbose=args.verbose,
             ).mux()
+
+if __name__ == "__main__":
+    if len(sys.argv) == 1:
+        from gooey import Gooey
+        main = Gooey(program_name='MotionPhoto2',
+                     default_size=(1100, 820),
+                     progress_regex=r"^=+\[(\d+)/(\d+)]$",
+                     progress_expr="x[0] / x[1] * 100",
+                     show_restart_button=False,
+                    )(main)
+    # Gooey reruns the script with this parameter for the actual execution.
+    # Since we don't use decorator to enable commandline use, remove this parameter
+    # and just run the main when in commandline mode.
+    if '--ignore-gooey' in sys.argv:
+        sys.argv.remove('--ignore-gooey')
+    main()
