@@ -30,7 +30,8 @@ def main():
 
     dir_group.add_argument(
         "-id", 
-        "--input-directory", 
+        "--input-directory",
+        metavar="Input Directory",
         help="Mux all the photos and videos in a directory",
         widget='DirChooser',
         gooey_options={'full_width':True}
@@ -39,6 +40,7 @@ def main():
     dir_group.add_argument(
         "-r",
         "--recursive",
+        metavar="Recursive",
         action="store_true",
         help="Recursively process subdirectories in input_directory",
         gooey_options={'initial_value':True}
@@ -47,6 +49,7 @@ def main():
     dir_group.add_argument(
         "-od",
         "--output-directory",
+        metavar="Output Directory",
         help="Directory where to save the resulting Live Photos",
         widget='DirChooser',
         gooey_options={'full_width':True}
@@ -60,6 +63,7 @@ def main():
     settings_group.add_argument(
         "-dv",
         "--delete-video",
+        metavar="Delete Video",
         action="store_true",
         help="Delete video after muxing",
     )
@@ -67,6 +71,7 @@ def main():
     settings_group.add_argument(
         "-o",
         "--overwrite",
+        metavar="Overwrite",
         action="store_true",
         help="Overwrite the original image",
     )
@@ -74,13 +79,15 @@ def main():
     settings_group.add_argument(
         "-kt",
         "--keep-temp",
+        metavar="Keep Temp",
         action="store_true",
         help="Keep muxing temp files",
     )
     
     settings_group.add_argument(
         "-v", 
-        "--verbose", 
+        "--verbose",
+        metavar="Verbose",
         action="store_true", 
         help="Verbose output"
     )
@@ -92,6 +99,7 @@ def main():
     file_group.add_argument(
         "-ii",
         "--input-image",
+        metavar="Input Image",
         help="Input file image (.heic, .jpg)",
         widget='FileChooser',
         gooey_options={
@@ -106,7 +114,8 @@ def main():
         
     file_group.add_argument(
         "-iv",
-        "--input-video", 
+        "--input-video",
+        metavar="Input Video",
         help="Input file video (.mov, .mp4)", 
         widget='FileChooser',
         gooey_options={
@@ -120,7 +129,8 @@ def main():
 
     file_group.add_argument(
         "-of", 
-        "--output-file", 
+        "--output-file",
+        metavar="Output File",
         help="Output Live Photo filename",
         widget='FileSaver',
         gooey_options={
@@ -136,6 +146,7 @@ def main():
     file_group.add_argument(
         "-nx",
         "--no-xmp",
+        metavar="No XMP",
         action="store_true",
         help="No XMP processing (just glue image and video using Samsung tags)",
         gooey_options={'visible':False}
