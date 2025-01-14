@@ -230,7 +230,7 @@ def main():
                 
                 for video_name in possible_video_names:
                     for ext in [".mp4", ".mov", ".MP4", ".MOV"]:
-                        video_fname = f"{Path(video_name).with_suffix(ext)}"
+                        video_fname = str(Path(video_name)) + f"{ext}"
                         if video_fname in videos:
                             print(f"=========================[{i}/{len(images)}]")
                             video = videos.pop(videos.index(video_fname))
