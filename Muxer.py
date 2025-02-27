@@ -36,6 +36,7 @@ class Muxer:
         delete_temp: bool = True,
         overwrite: bool = False,
         no_xmp: bool = False,
+        time_offset_sec: float = None,
         verbose: bool = False,
     ):
         self.logger = logging.getLogger(Path(image_fpath).stem)
@@ -51,6 +52,7 @@ class Muxer:
         self.overwrite = overwrite
         self.delete_video = delete_video
         self.no_xmp = no_xmp
+        self.time_offset_sec = time_offset_sec
         self.exiftool = exiftool
 
         if os.path.isfile(self.image_fpath) is False:
@@ -201,24 +203,29 @@ class Muxer:
         self.validate_video(self.video_fpath, metadata=video_metadata)
 
         if self.no_xmp is False:
-            result = self.exiftool.execute(
-                *[
-                    "-X",
-                    "-ee",
-                    "-n",
-                    "-QuickTime:StillImageTime",
-                    "-QuickTime:TrackDuration",
-                    f"{self.video_fpath}",
-                ]
-            )
-            
             try:
-                track_number = extract_track_number(result)
-                self.logger.info("Live Photo keyframe track number: %s", track_number)
+                if self.time_offset_sec is not None:
+                    track_duration = int(self.time_offset_sec * 1_000_000)
+                    self.logger.info("Live Photo keyframe (set manually): %sus", track_duration)
 
-                track_duration = extract_track_duration(track_number, result)
-                self.logger.info("Live Photo keyframe: %sus", track_duration)
-                
+                else:
+                    result = self.exiftool.execute(
+                        *[
+                            "-X",
+                            "-ee",
+                            "-n",
+                            "-QuickTime:StillImageTime",
+                            "-QuickTime:TrackDuration",
+                            f"{self.video_fpath}",
+                        ]
+                    )
+
+                    track_number = extract_track_number(result)
+                    self.logger.info("Live Photo keyframe track number: %s", track_number)
+
+                    track_duration = extract_track_duration(track_number, result)
+                    self.logger.info("Live Photo keyframe: %sus", track_duration)
+
                 self.xmp.find(".//rdf:Description", const.NAMESPACES).set(
                     const.GCAMER_TIMESTAMP_US,
                     str(track_duration),

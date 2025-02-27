@@ -152,6 +152,19 @@ def main():
         gooey_options={'visible':False}
     )
 
+    file_group.add_argument(
+        "-ts",
+        "--time-offset",
+        metavar="Time offset (seconds)",
+        help=("Manually set the key-frame's time offset, "
+              "instead of using the XMP value from the input video. "
+              "Only work with single file processing"),
+        type=float,
+        default=None,
+        action="store",
+        gooey_options={'visible':False},
+    )
+
     args = parser.parse_args()
 
     if args.input_directory is not None and (
@@ -275,6 +288,7 @@ def main():
                 delete_temp=not args.keep_temp,
                 overwrite=args.overwrite,
                 no_xmp=args.no_xmp,
+                time_offset_sec=args.time_offset,
                 verbose=args.verbose,
             ).mux()
 
