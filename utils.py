@@ -4,7 +4,7 @@ import struct
 
 from pathlib import Path
 
-import constants as const
+from MotionPhoto2 import constants as const
 
 
 def extract_track_number(metadata: str) -> str:

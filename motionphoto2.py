@@ -9,7 +9,7 @@ import logging
 from pathlib import Path
 from gooey import GooeyParser
 
-from Muxer import Muxer
+from MotionPhoto2.Muxer import Muxer
 
 logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],

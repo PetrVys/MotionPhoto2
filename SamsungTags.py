@@ -2,7 +2,7 @@ import os
 import sys
 import struct
 
-import constants as const
+from MotionPhoto2 import constants as const
 
 class SamsungTags:
     

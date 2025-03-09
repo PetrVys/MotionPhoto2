@@ -7,15 +7,15 @@ import shutil
 from pathlib import Path
 from lxml import etree
 
-from utils import (
+from MotionPhoto2.utils import (
     extract_track_number,
     extract_track_duration,
     read_file,
     enrich_fname,
 )
 
-import constants as const
-from SamsungTags import SamsungTags
+from MotionPhoto2 import constants as const
+from MotionPhoto2.SamsungTags import SamsungTags
 
 logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
