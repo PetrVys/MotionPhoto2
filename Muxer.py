@@ -94,6 +94,8 @@ class Muxer:
                 )
             )
         )
+        
+        self.org_outfpath = self.output_fpath
 
         self.delete_temp = delete_temp
         self.xmp = etree.fromstring(const.XMP)
@@ -278,3 +280,7 @@ class Muxer:
         if self.delete_video is True:
             os.remove(self.video_fpath)
             self.logger.debug("Delete: %s", self.video_fpath)
+            
+        if self.overwrite is True and self.output_fpath != self.org_outfpath:
+            os.remove(self.org_outfpath)
+            self.logger.debug("Delete: %s", self.org_outfpath)
