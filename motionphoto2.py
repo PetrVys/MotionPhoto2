@@ -94,7 +94,7 @@ def main():
 
     settings_group.add_argument(
         "-fm", 
-        "--use-filename-matching",
+        "--filename-matching",
         metavar="Use Filename Matching",
         action="store_true",
         help="Use filename matching instead of EXIF matching"
