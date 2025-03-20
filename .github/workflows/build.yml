@@ -7,7 +7,6 @@ on:
       - created
 
 jobs:
-
   build:
     name: Build packages
     permissions:
