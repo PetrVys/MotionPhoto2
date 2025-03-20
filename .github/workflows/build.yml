@@ -1,4 +1,4 @@
-name: Build, create package and attach it to a release
+name: Build a release
 
 on:
   workflow_dispatch:
