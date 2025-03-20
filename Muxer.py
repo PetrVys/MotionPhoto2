@@ -170,7 +170,7 @@ class Muxer:
 
                 self.output_fpath = os.path.join(
                     output_path.parent,
-                    output_path.stem + f".{image_metadata_extension}",
+                    output_path.stem + f".{image_metadata_extension.lower()}",
                 )
 
     def merge_xmp(self, xmp: str):
