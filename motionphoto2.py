@@ -47,6 +47,15 @@ def main():
     )
 
     dir_group.add_argument(
+        "-em", 
+        "--exif-match",
+        metavar="Match by EXIF",
+        action="store_true",
+        help="Match files by Live Photo EXIF metadata",
+        gooey_options={'initial_value':True}
+    )
+
+    dir_group.add_argument(
         "-od",
         "--output-directory",
         metavar="Output Directory",
@@ -57,7 +66,7 @@ def main():
 
     settings_group = parser.add_argument_group(
         "Settings",
-        gooey_options={'columns':2}
+        gooey_options={'columns':4}
     )
 
     settings_group.add_argument(
@@ -90,14 +99,6 @@ def main():
         metavar="Verbose",
         action="store_true", 
         help="Verbose output"
-    )
-
-    settings_group.add_argument(
-        "-fm", 
-        "--filename-matching",
-        metavar="Use Filename Matching",
-        action="store_true",
-        help="Use filename matching instead of EXIF matching"
     )
 
     file_group = parser.add_argument_group(
@@ -195,7 +196,6 @@ def main():
     ) as et:
 
         if args.input_directory is not None:
-            match_by = 'filename' if args.use_filename_matching else 'exif'
             print(f"Converting files in {args.input_directory}")
             input_directory = Path(args.input_directory).resolve()
             
@@ -225,7 +225,7 @@ def main():
                 if Path(f).suffix.lower() in [".heic", ".heif", ".avif", ".jpg", ".jpeg"]
             ]
             
-            if match_by == 'filename':
+            if not args.exif_match: # match by file name
                 i = 0
                 for image in images:
                     i += 1
@@ -275,7 +275,7 @@ def main():
                         break
                     else:
                         print(f"No matching video found for {image}")
-            elif match_by == 'exif':
+            else: # match by exif
                 image_paths = [input_directory / img for img in images]
                 video_paths = [input_directory / vid for vid in videos]
                 image_metadatas = et.get_metadata([str(p) for p in image_paths])
