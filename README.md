@@ -40,17 +40,17 @@ motionphoto2 --input-image ImageFile.HEIC --input-video VideoFile.MP4
 
 ### Directory mode
 
-The script will automatically match image and video files in the specified directory using EXIF metadata by default. 
-This ensures accurate pairing for sources from iPhone Live Photos, even if filenames differ. For example, it can match `IMG_1234.HEIC` with `IMG_9876.MOV`. (Useful for e.g. [iCloud Photos Downloader](https://github.com/icloud-photos-downloader/icloud_photos_downloader))
+The script will match image and video files automatically by filenames when run from commandline. Only direct match (e.g. `IMG_1234.HEIC` and `IMG_1234.MOV`)
 
 ```
 motionphoto2 --input-directory /your/directory
 ```
 
-To use the legacy filename-based matching (pairing based on shared base names), use the `--filename-matching` option:
+If you add the `--exif-match` option, the script will automatically match image and video files in the specified directory using EXIF metadata. 
+This ensures accurate pairing for sources from iPhone Live Photos, even if filenames differ. For example, it can correctly match `IMG_1234.HEIC` with `IMG_1234(2).MOV` and ignore the seemingly correct match `IMG_1234.HEIC` + `IMG_1234.MOV`. (Very useful for [Google Takeout](https://takeout.google.com/settings/takeout/custom/photos) or [iCloud Photos Downloader](https://github.com/icloud-photos-downloader/icloud_photos_downloader))
 
 ```
-motionphoto2 --input-directory /your/directory --filename-matching
+motionphoto2 --input-directory /your/directory --exif-match
 ```
 
 ### Notes
@@ -73,11 +73,13 @@ The reason is probably directly related to Motion Photos - the same place where 
 
 It appears that the server-side processing of Google Photos does not check for Apple HDR once it finds Google Camera header in XMP tags. For JPG files, a conversion is possible by adjusting metadata and is on the roadmap. Unfortunately there is no support for Gainmap HDR HEIF images in libultrahdr or any modern Android devices at the moment.
 
-Hopefully, as Gainmap HDR matures, both Google and Apple will converge on ISO/CD 21496-1 and things will just start working. On Apple side this has happened already - as of iOS18 RC on iPhone 15(pro), iOS stores HDR in ISO "urn:iso:std:iso:ts:21496:-1" format for both JPG and HEIF. Unfortunately iPhones 12-14 are stuck with Apple Gainmaps (for JPGs, it should be possible to remux them to ISO format, though). On Google side keep an eye on [libultrahdr](https://github.com/google/libultrahdr) used in Android and also most likely in GPhotos backend. It currently only supports JPEG/R, but HEIC support [is on the way](https://github.com/google/libultrahdr/issues/195).
+Hopefully, as Gainmap HDR matures, both Google and Apple will converge on ISO/CD 21496-1 and things will just start working. On Apple side this has happened already - as of iOS18 RC on iPhone 15(pro), iOS stores HDR in ISO tmap format for both JPG and HEIF. Unfortunately iPhones 12-14 are stuck with Apple Gainmaps (for JPGs, it should be possible to remux them to ISO format, though). On Google side keep an eye on [libultrahdr](https://github.com/google/libultrahdr) used in Android and also most likely in GPhotos backend. It currently only supports JPEG/R, but HEIC support [is on the way](https://github.com/google/libultrahdr/issues/195).
 
 ## Credits
 
 Huge thanks to [@Tkd-Alex](https://github.com/Tkd-Alex) for porting the original PowerShell script to Python. It is now much faster and easier to adjust to boot.
+
+Thanks to [@NightMean](https://github.com/NightMean) for implementing the exif metadata matching.
 
 Thanks to [@tribut](https://github.com/tribut), [@Tkd-Alex](https://github.com/Tkd-Alex), [@4Urban](https://github.com/4Urban), [@IamRysing](https://github.com/IamRysing) and [@NightMean](https://github.com/NightMean) for providing sample Motion Photo pictures (check them out [here](https://github.com/PetrVys/MotionPhotoSamples))
 
