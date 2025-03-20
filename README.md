@@ -23,7 +23,7 @@ The script requires [ExifTool](https://exiftool.org/) and [Python 3.7+](https://
 Once you have Python and ExifTool installed on your OS, navigate to the script's directory and run following command to download script's dependencies
 
 ```
-> pip install -r requirements.txt
+pip install -r requirements.txt
 ```
 
 ## Usage
@@ -32,28 +32,36 @@ Just run the script! If you run it without parameters, it'll present a GUI with 
 
 ### Individual photos
 
-To convert image and video pair to Motion Photo v2, run:
+To convert an image and video pair to a Motion Photo v2, run:
 
 ```
-> motionphoto2 --input-image ImageFile.HEIC --input-video VideoFile.MP4
+motionphoto2 --input-image ImageFile.HEIC --input-video VideoFile.MP4
 ```
 
 ### Directory mode
 
-The script will automatically search file in directory that have the same name but different extension, for example: IMG_1496.HEIC, IMG_1496.MP4
+The script will automatically match image and video files in the specified directory using EXIF metadata by default. 
+This ensures accurate pairing for sources from iPhone Live Photos, even if filenames differ. For example, it can match `IMG_1234.HEIC` with `IMG_9876.MOV`. (Useful for e.g. [iCloud Photos Downloader](https://github.com/icloud-photos-downloader/icloud_photos_downloader))
 
 ```
-> motionphoto2 --input-directory /your/directory
+motionphoto2 --input-directory /your/directory
+```
+
+To use the legacy filename-based matching (pairing based on shared base names), use the `--filename-matching` option:
+
+```
+motionphoto2 --input-directory /your/directory --filename-matching
 ```
 
 ### Notes
 
-- The output of new images file will be: original_name.**LIVE**.ext
-- If you want to process recursively all subdirectories use: `--recursive`
-- If you provide a `--output-directory` the file will be: **output-directory**/original_name.ext
-- While the script muxes the image and video two temp files will be created and deleted automatically, you can keep it with `--keep-temp`
-- If you want to replace the original image file with the live one use: `--overwrite` (use at your risk)
-- If you want to remove the video file after muxing use: `--delete-video` (use at your risk)
+- The output of new image files will be: original_name.**LIVE**.ext (unless overridden).
+- If you want to process recursively all subdirectories, use: `--recursive`.
+- If you provide an `--output-directory`, the file will be saved as: **output-directory**/original_name.ext.
+- While the script muxes the image and video, two temp files will be created and deleted automatically; keep them with `--keep-temp`.
+- To replace the original image file with the live one, use: `--overwrite` (use at your risk).
+- To remove the video file after muxing, use: `--delete-video` (use at your risk).
+- To use filename matching instead of EXIF matching, use: `--filename-matching`
 
 ## Limitations
 
