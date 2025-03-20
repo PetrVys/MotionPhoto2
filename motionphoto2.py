@@ -269,7 +269,10 @@ def main():
             else: # match by exif
                 image_paths = [input_directory / img for img in images]
                 video_paths = [input_directory / vid for vid in videos]
+                print("Running in EXIF matching mode.")
+                print("Getting metadata for images, please wait...")
                 image_metadatas = et.get_metadata([str(p) for p in image_paths])
+                print("Getting metadata for videos, please wait...")
                 video_metadatas = et.get_metadata([str(p) for p in video_paths])
                 
                 # Map content identifiers to video relative paths
