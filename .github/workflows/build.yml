@@ -11,17 +11,13 @@ jobs:
   createrelease:
     name: Create Release
     runs-on: [ubuntu-latest]
+    permissions:
+      contents: write
     steps:
+    - uses: actions/checkout@v4
     - name: Create Release
       id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        tag_name: ${{ github.ref }}
-        release_name: Release ${{ github.ref }}
-        draft: false
-        prerelease: false
+      uses: ncipollo/release-action@v1
     - name: Output Release URL File
       run: echo "${{ steps.create_release.outputs.upload_url }}" > release_url.txt
     - name: Save Release URL File for publish
@@ -51,7 +47,7 @@ jobs:
             OUT_FILE_NAME: motionphoto2.exe
             ASSET_MIME: application/vnd.microsoft.portable-executable
     steps:
-    - uses: actions/checkout@v1
+    - uses: actions/checkout@v4
     - name: Set up Python 3.8
       uses: actions/setup-python@v2
       with:
