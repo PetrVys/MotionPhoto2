@@ -61,7 +61,7 @@ motionphoto2 --input-directory /your/directory --exif-match
 - While the script muxes the image and video, two temp files will be created and deleted automatically; keep them with `--keep-temp`.
 - To replace the original image file with the live one, use: `--overwrite` (use at your risk).
 - To remove the video file after muxing, use: `--delete-video` (use at your risk).
-- To use filename matching instead of EXIF matching, use: `--filename-matching`
+- To use EXIF matching instead of filename matching, use: `--exif-match`
 
 ## Limitations
 
