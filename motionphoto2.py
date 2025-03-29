@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 
 import argparse
+import filecmp
+import itertools
+import shutil
 import sys
 import os
 import exiftool
@@ -67,6 +70,14 @@ def main():
     settings_group = parser.add_argument_group(
         "Settings",
         gooey_options={'columns':4}
+    )
+
+    settings_group.add_argument(
+        "-cu",
+        "--copy-unmuxed",
+        metavar="Copy Unmuxed",
+        action="store_true",
+        help="Copy files not needing muxing during directory processing",
     )
 
     settings_group.add_argument(
@@ -174,6 +185,10 @@ def main():
             print("[ERROR] Please provide both input image/video or input directory")
             sys.exit(1)
 
+    if args.output_directory is None and args.copy_unmuxed is True:
+        print("[ERROR] Copy unmuxed cannot be used without output directory")
+        sys.exit(1)
+
     if args.output_directory is not None and args.overwrite is True:
         print("[ERROR] Output directory cannot be use overwrite option")
         sys.exit(1)
@@ -182,10 +197,25 @@ def main():
         print("[ERROR] Output file cannot be use overwrite option")
         sys.exit(1)
 
+    if args.copy_unmuxed is not None and args.overwrite is True:
+        print("[ERROR] Copy Unmuxed cannot be used with overwrite option")
+        sys.exit(1)
+
+    if args.copy_unmuxed is not None and args.delete_video is True:
+        print("[ERROR] Copy Unmuxed cannot be used with delete-video option")
+        sys.exit(1)
+
     if args.output_directory is not None:
         output_directory = f"{Path(args.output_directory).resolve()}"
         if os.path.exists(output_directory) is False:
             os.mkdir(output_directory)
+        elif os.path.isfile(output_directory):
+            print("[ERROR] Output directory cannot be a file")
+            sys.exit(1)
+        elif args.copy_unmuxed is not None:
+            input_directory = f"{Path(args.input_directory).resolve()}"
+            if os.path.samefile(input_directory, output_directory): # Input directory and output directory cannot be same if copying unmuxed files
+                print("[ERROR] Output directory cannot be the same as input directory")
             
     logger = logging.getLogger("ExifTool")
     logger.setLevel(logging.DEBUG if args.verbose else logging.INFO)
@@ -224,6 +254,8 @@ def main():
                 f for f in files
                 if Path(f).suffix.lower() in [".heic", ".heif", ".avif", ".jpg", ".jpeg"]
             ]
+
+            unmatched_images = []
             
             if not args.exif_match: # match by file name
                 i = 0
@@ -265,6 +297,8 @@ def main():
                             break
                     else:
                         print(f"No matching video found for {image}")
+                        if args.copy_unmuxed:
+                            unmatched_images.append(image)
                         
             else: # match by exif
                 image_paths = [input_directory / img for img in images]
@@ -294,6 +328,9 @@ def main():
                     if content_id and content_id.strip() in content_id_to_video:
                         print(f"=========================[{i}/{len(images)}]")
                         video = content_id_to_video[content_id.strip()]
+
+                        if args.copy_unmuxed:
+                            videos.remove(video)
                         
                         # Construct full paths for input files
                         input_image = input_directory / img
@@ -321,6 +358,28 @@ def main():
                         ).mux()
                     else:
                         print(f"No matching video found for {img}")
+                        if args.copy_unmuxed:
+                            unmatched_images.append(img)
+
+            # Copy unmuxed images and videos while preserving the directory structure
+            if args.copy_unmuxed:
+                print("=" * 25)
+                print("Copying unmuxed images and videos...")
+                for file in itertools.chain(unmatched_images, videos):
+                    # Handle output directory structure
+                    output_subdirectory = args.output_directory
+                    if output_subdirectory is not None:
+                        file_path = Path(file)
+                        output_subdirectory = Path(output_subdirectory) / file_path.parent
+                        output_subdirectory = output_subdirectory.resolve()
+                        if not output_subdirectory.exists():
+                            output_subdirectory.mkdir(parents=True, exist_ok=True)
+                    print(f"Copying {file} to {output_subdirectory}")
+                    if os.path.exists(output_subdirectory / file_path.name) and filecmp.cmp(input_directory / file, output_subdirectory / file_path.name):
+                        if args.verbose:
+                            print(f"[DEBUG][WARNING] File {file} already exists in output directory, skipping..." )
+                        continue
+                    shutil.copy2(input_directory / file, output_subdirectory)
             print("=" * 25)
         else:
             Muxer(
