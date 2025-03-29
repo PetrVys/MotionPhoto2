@@ -47,9 +47,7 @@ exe = EXE(pyz,
           console=False,
           icon=os.path.join(gooey_root, 'images', 'program_icon.ico'))
 
-info_plist = {'addition_prop': 'additional_value'}
 app = BUNDLE(exe,
              name='motionphoto2.app',
              bundle_identifier=None,
-             info_plist=info_plist
             )
