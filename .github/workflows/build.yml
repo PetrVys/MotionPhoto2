@@ -15,11 +15,11 @@ jobs:
     strategy:
       matrix:
         include:
-#          - os: macos-latest
-#            TARGET: macos
-#            CMD_BUILD: pyinstaller build-osx.spec
-#            CMD_ZIP: zip -r9 MotionPhoto2_macos motionphoto2.app/                
-#            OUT_FILE_NAME: MotionPhoto2_macos.zip
+          - os: macos-latest
+            TARGET: macos
+            CMD_BUILD: pyinstaller --windowed build-osx.spec
+            CMD_ZIP: zip -r9 MotionPhoto2_macos motionphoto2.app/
+            OUT_FILE_NAME: MotionPhoto2_macos.zip
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: pyinstaller build-win.spec
