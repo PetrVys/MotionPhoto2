@@ -254,6 +254,11 @@ def main():
                 f for f in files
                 if Path(f).suffix.lower() in [".heic", ".heif", ".avif", ".jpg", ".jpeg"]
             ]
+            
+            unsupported = [
+                f for f in files
+                if Path(f).suffix.lower() not in [".mp4", ".mov", ".heic", ".heif", ".avif", ".jpg", ".jpeg"]
+            ]
 
             unmatched_images = []
             
@@ -364,8 +369,8 @@ def main():
             # Copy unmuxed images and videos while preserving the directory structure
             if args.copy_unmuxed:
                 print("=" * 25)
-                print("Copying unmuxed images and videos...")
-                for file in itertools.chain(unmatched_images, videos):
+                print("Copying unmuxed files...")
+                for file in itertools.chain(unmatched_images, videos, unsupported):
                     # Handle output directory structure
                     output_subdirectory = args.output_directory
                     if output_subdirectory is not None:
