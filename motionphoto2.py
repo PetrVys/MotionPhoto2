@@ -28,7 +28,8 @@ def main():
     )
     
     dir_group = parser.add_argument_group(
-        "Process a Directory"
+        "Process a Directory",
+        gooey_options={'columns':4}
     )
 
     dir_group.add_argument(
@@ -45,7 +46,7 @@ def main():
         "--recursive",
         metavar="Recursive",
         action="store_true",
-        help="Recursively process subdirectories in input_directory",
+        help="Recursively process subdirectories",
         gooey_options={'initial_value':True}
     )
 
@@ -54,15 +55,23 @@ def main():
         "--exif-match",
         metavar="Match by EXIF",
         action="store_true",
-        help="Match files by Live Photo EXIF metadata",
+        help="Match files by Live Photo metadata",
         gooey_options={'initial_value':True}
+    )
+
+    dir_group.add_argument(
+        "-cu",
+        "--copy-unmuxed",
+        metavar="Copy Unmuxed",
+        action="store_true",
+        help="Copy files that are not Live Photos",
     )
 
     dir_group.add_argument(
         "-od",
         "--output-directory",
         metavar="Output Directory",
-        help="Directory where to save the resulting Live Photos",
+        help="Directory where to save the resulting Motion Photos",
         widget='DirChooser',
         gooey_options={'full_width':True}
     )
@@ -70,14 +79,6 @@ def main():
     settings_group = parser.add_argument_group(
         "Settings",
         gooey_options={'columns':4}
-    )
-
-    settings_group.add_argument(
-        "-cu",
-        "--copy-unmuxed",
-        metavar="Copy Unmuxed",
-        action="store_true",
-        help="Copy files not needing muxing during directory processing",
     )
 
     settings_group.add_argument(

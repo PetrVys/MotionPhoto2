@@ -53,13 +53,6 @@ This ensures accurate pairing for sources from iPhone Live Photos, even if filen
 motionphoto2 --input-directory /your/directory --exif-match
 ```
 
-If you add `--copy-unmuxed` option, the script will automatically copy files not needing muxing during directory processing, i.e., still photos and and individual videos.
-This can be used for copying your whole library to a different folder while preserving the folder structure. It also checks if the file already exists and does not copy if that's the case. (Useful for incremental photo library updates)
-
-```
-motionphoto2 --input-directory /your/directory --output-directory /your/output/directory --copy-unmuxed
-```
-
 ### Notes
 
 - The output of new image files will be: original_name.**LIVE**.ext (unless overridden).
@@ -69,7 +62,7 @@ motionphoto2 --input-directory /your/directory --output-directory /your/output/d
 - To replace the original image file with the live one, use: `--overwrite` (use at your risk).
 - To remove the video file after muxing, use: `--delete-video` (use at your risk).
 - To use EXIF matching instead of filename matching, use: `--exif-match`
-- To copy files not needing muxing during directory processing, use: `--copy-unmuxed`
+- To copy files other than live/motion photo muxing during directory processing, use: `--copy-unmuxed`
 
 ## Limitations
 
@@ -88,6 +81,7 @@ Hopefully, as Gainmap HDR matures, both Google and Apple will converge on ISO/CD
 Huge thanks to [@Tkd-Alex](https://github.com/Tkd-Alex) for porting the original PowerShell script to Python. It is now much faster and easier to adjust to boot.
 
 Thanks to [@NightMean](https://github.com/NightMean) for implementing the exif metadata matching.
+Thanks to [@sahilph](https://github.com/sahilph) for copying of non-live photos in dir mode.
 
 Thanks to [@tribut](https://github.com/tribut), [@Tkd-Alex](https://github.com/Tkd-Alex), [@4Urban](https://github.com/4Urban), [@IamRysing](https://github.com/IamRysing) and [@NightMean](https://github.com/NightMean) for providing sample Motion Photo pictures (check them out [here](https://github.com/PetrVys/MotionPhotoSamples))
 
