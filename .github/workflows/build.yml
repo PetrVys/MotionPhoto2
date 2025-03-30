@@ -23,7 +23,7 @@ jobs:
           - os: ubuntu-latest
             TARGET: linux
             CMD_BUILD: pyinstaller build-osx-linux.spec
-            CMD_ZIP: zip -r9 MotionPhoto2_macos motionphoto2
+            CMD_ZIP: zip -r9 MotionPhoto2_linux motionphoto2
             OUT_FILE_NAME: MotionPhoto2_linux.zip
           - os: windows-latest
             TARGET: windows
