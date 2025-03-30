@@ -15,11 +15,16 @@ jobs:
     strategy:
       matrix:
         include:
-#          - os: macos-latest
-#            TARGET: macos
-#            CMD_BUILD: pyinstaller build-osx.spec
-#            CMD_ZIP: zip -r9 MotionPhoto2_macos motionphoto2.app/                
-#            OUT_FILE_NAME: MotionPhoto2_macos.zip
+          - os: macos-latest
+            TARGET: macos
+            CMD_BUILD: pyinstaller build-osx-linux.spec
+            CMD_ZIP: zip -r9 MotionPhoto2_macos motionphoto2
+            OUT_FILE_NAME: MotionPhoto2_macos.zip
+          - os: ubuntu-latest
+            TARGET: linux
+            CMD_BUILD: pyinstaller build-osx-linux.spec
+            CMD_ZIP: zip -r9 MotionPhoto2_linux motionphoto2
+            OUT_FILE_NAME: MotionPhoto2_linux.zip
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: pyinstaller build-win.spec
@@ -33,13 +38,44 @@ jobs:
       uses: actions/setup-python@v5
       with:
         python-version: 3.13
-        
+
+    - name: Install pre-requisite dependencies for linux
+      if: ${{matrix.TARGET == 'linux'}}
+      run: |
+        sudo apt update
+        sudo apt install -y dpkg-dev \
+          build-essential \
+          python3-dev \
+          freeglut3-dev \
+          libgl1-mesa-dev \
+          libglu1-mesa-dev \
+          libgstreamer-plugins-base1.0-dev \
+          libgtk-3-dev \
+          libjpeg-dev \
+          libnotify-dev \
+          libpng-dev \
+          libsdl2-dev \
+          libsm-dev \
+          libtiff-dev \
+          libwebkit2gtk-4.1-dev \
+          libxtst-dev
+
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt 
         pip install pyinstaller       
-        
+
+    - name: Install dependencies specific for macOS
+      if: ${{matrix.TARGET == 'macos'}}
+      run: |
+        pip install --force-reinstall --no-binary :all: psutil
+        pip download -d /tmp --only-binary :all: --platform macosx_10_13_x86_64 pillow
+        pip download -d /tmp --only-binary :all: --platform macosx_11_0_arm64 pillow
+        pip install delocate
+        delocate-merge /tmp/pillow-*
+        pip install --force-reinstall /tmp/pillow-*_universal2.whl
+
     - name: Build with pyinstaller for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
       
