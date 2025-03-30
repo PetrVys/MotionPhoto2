@@ -42,8 +42,8 @@ jobs:
     - name: Install pre-requisite dependencies for linux
       if: ${{matrix.TARGET == 'linux'}}
       run: |
-        apt update
-        apt install -y dpkg-dev \
+        sudo apt update
+        sudo apt install -y dpkg-dev \
           build-essential \
           python3-dev \
           freeglut3-dev \
