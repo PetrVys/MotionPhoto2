@@ -18,18 +18,18 @@ jobs:
           - os: macos-latest
             TARGET: macos
             CMD_BUILD: pyinstaller build-osx-linux.spec
-            CMD_ZIP: zip -r9 MotionPhoto2_macos motionphoto2
-            OUT_FILE_NAME: MotionPhoto2_macos.zip
+            CMD_ZIP: zip -r9 MotionPhoto2_macOS_${{ github.ref_name }}.zip motionphoto2
+            OUT_FILE_NAME: MotionPhoto2_macOS_${{ github.ref_name }}.zip
           - os: ubuntu-latest
             TARGET: linux
             CMD_BUILD: pyinstaller build-osx-linux.spec
-            CMD_ZIP: zip -r9 MotionPhoto2_linux motionphoto2
-            OUT_FILE_NAME: MotionPhoto2_linux.zip
+            CMD_ZIP: zip -r9 MotionPhoto2_Linux_${{ github.ref_name }}.zip motionphoto2
+            OUT_FILE_NAME: MotionPhoto2_Linux_${{ github.ref_name }}.zip
           - os: windows-latest
             TARGET: windows
             CMD_BUILD: pyinstaller build-win.spec
-            CMD_ZIP: Compress-Archive motionphoto2.exe MotionPhoto2_Windows.zip
-            OUT_FILE_NAME: MotionPhoto2_Windows.zip
+            CMD_ZIP: Compress-Archive motionphoto2.exe MotionPhoto2_Windows_${{ github.ref_name }}.zip
+            OUT_FILE_NAME: MotionPhoto2_Windows_${{ github.ref_name }}.zip
     steps:
     - name: Checkout sources
       uses: actions/checkout@v4
