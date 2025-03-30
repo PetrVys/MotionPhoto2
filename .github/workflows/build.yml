@@ -57,7 +57,7 @@ jobs:
           libsdl2-dev \
           libsm-dev \
           libtiff-dev \
-          libwebkit2gtk-4.0-dev \
+          libwebkit2gtk-4.1-dev \
           libxtst-dev
 
     - name: Install dependencies
@@ -69,7 +69,7 @@ jobs:
     - name: Install dependencies specific for macOS
       if: ${{matrix.TARGET == 'macos'}}
       run: |
-        pip install --force-install --no-binary :all: psutil
+        pip install --force-reinstall --no-binary :all: psutil
         pip download -d /tmp --only-binary :all: --platform macosx_10_13_x86_64 pillow
         pip download -d /tmp --only-binary :all: --platform macosx_11_0_arm64 pillow
         pip install delocate
