@@ -18,9 +18,7 @@ Then download the Windows release and enjoy!
 
 ### Unix and MacOS
 
-The script requires [ExifTool](https://exiftool.org/) and [Python 3.7+](https://www.python.org/) on your computer. Both Python and ExifTool should be in your package managers or installed already, please install them if you did not yet.
-
-Once you have Python and ExifTool installed on your OS, download the respective release for your OS and extract the binary file from the zip archive.
+The script requires [ExifTool](https://exiftool.org/) on your computer. Once you have exiftool installed, download the respective release for your OS and extract the binary file from the zip archive.
 
 Open the terminal and navigate to the directory where the file is extracted. Then make sure the file is executable by running the command in the terminal:
 
@@ -33,6 +31,10 @@ You may now run the binary either by _double-clicking_ on it from your file expl
 ```
 ./motionphoto2
 ```
+
+### Running from python interpreter directly
+
+If you have both exiftool and python 3.7+ installed, the script works just by calling motionphoto2.py (with parameters if required). Please install prerequisities using `pip install -r requirements.txt`
 
 ## Usage
 
