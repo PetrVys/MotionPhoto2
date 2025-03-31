@@ -96,6 +96,14 @@ def main():
         action="store_true",
         help="Overwrite the original image",
     )
+
+    settings_group.add_argument(
+        "-im",
+        "--incremental-mode",
+        metavar="Incremental Mode",
+        action="store_true",
+        help="Skip muxing if output file is already a motion photo.",
+    )
     
     settings_group.add_argument(
         "-kt",
@@ -188,6 +196,14 @@ def main():
 
     if args.output_directory is None and args.copy_unmuxed is True:
         print("[ERROR] Copy unmuxed cannot be used without output directory")
+        sys.exit(1)
+
+    if args.output_directory is None and args.incremental_mode is True:
+        print("[ERROR] Incremental mode cannot be used without output directory")
+        sys.exit(1)
+
+    if args.exif_match is False and args.incremental_mode is True:
+        print("[ERROR] Incremental mode cannot be used without EXIF matching")
         sys.exit(1)
 
     if args.output_directory is not None and args.overwrite is True:
@@ -350,7 +366,26 @@ def main():
                             output_subdirectory = output_subdirectory.resolve()
                             if not output_subdirectory.exists():
                                 output_subdirectory.mkdir(parents=True, exist_ok=True)
-                        
+
+                        if args.incremental_mode:
+                            output_image_path = output_subdirectory / image_path.name
+                            if os.path.exists(output_image_path):
+                                output_metadata = et.get_metadata(output_image_path)[0]
+                                output_image_content_id = output_metadata.get('MakerNotes:ContentIdentifier')
+                                output_video_data_from_image = et.execute("-b",
+                                                                          "-QuickTime:MotionPhotoVideo",
+                                                                          output_image_path,
+                                                                          raw_bytes=True)
+                                #if output_video_data_from_image:
+                                if all((output_video_data_from_image,
+                                        output_image_content_id,
+                                        output_video_data_from_image.find(output_image_content_id.strip().encode()),
+                                        output_video_data_from_image.find(content_id.strip().encode()))):
+                                        if args.verbose:
+                                            print(f"[DEBUG] ContentIdentifier '{content_id.strip()}' of the source {input_image} and {output_image_path} destination matches")
+                                        print(f"Skipping {img} as it is already a motion photo.")
+                                        continue
+                        print("Muxer running.....................................")
                         Muxer(
                             image_fpath=str(input_image),
                             video_fpath=str(input_video),
