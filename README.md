@@ -73,6 +73,7 @@ motionphoto2 --input-directory /your/directory --exif-match
 - To remove the video file after muxing, use: `--delete-video` (use at your risk).
 - To use EXIF matching instead of filename matching, use: `--exif-match`
 - To copy files other than live/motion photo muxing during directory processing, use: `--copy-unmuxed`
+- To skip muxing if destination is already a motion photo use: `--incremental-mode` (Useful for performing incremental photo library updates)
 
 ## Limitations
 
