@@ -73,3 +73,8 @@ SAMSUNG_TAG_IDS = {
 }
 
 SAMSUNG_SEFH_VERSION = 107
+
+VIDEO_SIGNATURE = {
+    "MOV": [sig.encode('iso-8859-1') for sig in ["ftypqt", "wide", "free", "mdat", "pnot", "skip"]],
+    "MP4": [sig.encode('iso-8859-1') for sig in ["ftypMSNV", "ftypisom"]]
+}
