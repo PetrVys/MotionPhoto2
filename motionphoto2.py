@@ -13,6 +13,7 @@ from pathlib import Path
 from gooey import GooeyParser
 
 from Muxer import Muxer
+from utils import is_motion_photo, extract_video_from_image, input_output_binary_compare
 
 logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
@@ -202,10 +203,6 @@ def main():
         print("[ERROR] Incremental mode cannot be used without output directory")
         sys.exit(1)
 
-    if args.exif_match is False and args.incremental_mode is True:
-        print("[ERROR] Incremental mode cannot be used without EXIF matching")
-        sys.exit(1)
-
     if args.output_directory is not None and args.overwrite is True:
         print("[ERROR] Output directory cannot be use overwrite option")
         sys.exit(1)
@@ -285,6 +282,13 @@ def main():
                     i += 1
                     image_path = Path(image)
                     fname = str(image_path.with_suffix(''))
+
+                    # Check if source image is already a motion photo
+                    if is_motion_photo(input_directory / image):
+                        print(f"Input {image} is already a motion photo, skipping muxing...")
+                        if args.copy_unmuxed:
+                            unmatched_images.append(image)
+                        continue
                     
                     for ext in [".mp4", ".mov", ".MP4", ".MOV"]:
                         video_fname = fname + ext
@@ -304,6 +308,12 @@ def main():
                                 output_subdirectory = output_subdirectory.resolve()
                                 if not output_subdirectory.exists():
                                     output_subdirectory.mkdir(parents=True, exist_ok=True)
+
+                            if args.incremental_mode:
+                                output_image_path = output_subdirectory / image_path.name
+                                if os.path.exists(output_image_path) and input_output_binary_compare(input_image,input_video,output_image_path):
+                                    print(f"Destination {image} is already a motion photo, skipping...")
+                                    break
                             
                             Muxer(
                                 image_fpath=str(input_image),
@@ -343,6 +353,14 @@ def main():
                 # Match images to videos
                 i = 0
                 for img, img_meta in zip(images, image_metadatas):
+
+                    # Check if source image is already a motion photo
+                    if is_motion_photo(input_directory / img):
+                        print(f"Input {img} is already a motion photo, skipping muxing...")
+                        if args.copy_unmuxed:
+                            unmatched_images.append(img)
+                        continue
+
                     i += 1
                     content_id = img_meta.get('MakerNotes:ContentIdentifier')
                     if args.verbose and content_id:
@@ -368,23 +386,28 @@ def main():
                                 output_subdirectory.mkdir(parents=True, exist_ok=True)
 
                         if args.incremental_mode:
+                            # Try matching using Content id
                             output_image_path = output_subdirectory / image_path.name
                             if os.path.exists(output_image_path):
                                 output_metadata = et.get_metadata(output_image_path)[0]
                                 output_image_content_id = output_metadata.get('MakerNotes:ContentIdentifier')
-                                output_video_data_from_image = et.execute("-b",
-                                                                          "-QuickTime:MotionPhotoVideo",
-                                                                          output_image_path,
-                                                                          raw_bytes=True)
-                                #if output_video_data_from_image:
+                                output_video_data_from_image = extract_video_from_image(output_image_path, args.verbose)
+
+                                # Check if content IDs match
                                 if all((output_video_data_from_image,
                                         output_image_content_id,
                                         output_video_data_from_image.find(output_image_content_id.strip().encode()),
                                         output_video_data_from_image.find(content_id.strip().encode()))):
                                         if args.verbose:
                                             print(f"[DEBUG] ContentIdentifier '{content_id.strip()}' of the source {input_image} and {output_image_path} destination matches")
-                                        print(f"Skipping {img} as it is already a motion photo.")
+                                        print(f"Destination {img} as it is already a motion photo, skipping...")
                                         continue
+                                else:
+                                    # Do binary comparison to check input and output
+                                    if input_output_binary_compare(input_image,input_video,output_image_path):
+                                        print(f"Destination {img} is already a motion photo, skipping...")
+                                        continue
+
                         print("Muxer running.....................................")
                         Muxer(
                             image_fpath=str(input_image),
