@@ -284,7 +284,7 @@ def main():
                     fname = str(image_path.with_suffix(''))
 
                     # Check if source image is already a motion photo
-                    if is_motion_photo(input_directory / image):
+                    if is_motion_photo(input_directory / image, et):
                         print(f"Input {image} is already a motion photo, skipping muxing...")
                         if args.copy_unmuxed:
                             unmatched_images.append(image)
@@ -355,7 +355,7 @@ def main():
                 for img, img_meta in zip(images, image_metadatas):
 
                     # Check if source image is already a motion photo
-                    if is_motion_photo(input_directory / img):
+                    if is_motion_photo(input_directory / img, et):
                         print(f"Input {img} is already a motion photo, skipping muxing...")
                         if args.copy_unmuxed:
                             unmatched_images.append(img)
@@ -391,7 +391,7 @@ def main():
                             if os.path.exists(output_image_path):
                                 output_metadata = et.get_metadata(output_image_path)[0]
                                 output_image_content_id = output_metadata.get('MakerNotes:ContentIdentifier')
-                                output_video_data_from_image = extract_video_from_image(output_image_path, args.verbose)
+                                output_video_data_from_image = extract_video_from_image(output_image_path, et)
 
                                 # Check if content IDs match
                                 if all((output_video_data_from_image,

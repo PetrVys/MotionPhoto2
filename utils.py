@@ -32,8 +32,8 @@ def enrich_fname(fpath: str, enrich: str) -> str:
     fname = f"{p.stem}.{enrich}{p.suffix}"
     return os.path.join(p.parent, fname)
 
-def is_motion_photo(fpath: str, verbose: bool = False) -> bool:
-    video_in_image = extract_video_from_image(fpath, verbose)
+def is_motion_photo(fpath: str, et: exiftool.ExifToolHelper) -> bool:
+    video_in_image = extract_video_from_image(fpath, et)
 
     # Check if the data received is actually a video file
     if video_in_image and  verify_video_in_image(video_in_image):
@@ -48,28 +48,21 @@ def verify_video_in_image(video_in_image: bytes) -> bool :
     return False
 
 
-def extract_video_from_image(fpath: str, verbose: bool = False) -> bytes:
-    logger = logging.getLogger("ExifTool")
-    logger.setLevel(logging.DEBUG if verbose else logging.INFO)
+def extract_video_from_image(fpath: str, et: exiftool.ExifToolHelper) -> bytes:
+    # Check using GCamera headers
+    video_in_image = et.execute("-b",
+                                "-MotionPhotoVideo",
+                                fpath,
+                                raw_bytes=True)
 
-    with exiftool.ExifToolHelper(
-            encoding="utf-8",
-            logger=logger if verbose is True else None
-    ) as et:
-        # Check using GCamera headers
+    # If not then check using samsung headers
+    if not video_in_image:
         video_in_image = et.execute("-b",
-                                    "-MotionPhotoVideo",
+                                    "-EmbeddedVideoFile",
                                     fpath,
                                     raw_bytes=True)
 
-        # If not then check using samsung headers
-        if not video_in_image:
-            video_in_image = et.execute("-b",
-                                        "-EmbeddedVideoFile",
-                                        fpath,
-                                        raw_bytes=True)
-
-        return video_in_image
+    return video_in_image
 
 def input_output_binary_compare(input_image: str, input_video: str, output_image: str) -> bool:
     if all((os.path.exists(input_image), os.path.exists(input_video), os.path.exists(output_image))):
