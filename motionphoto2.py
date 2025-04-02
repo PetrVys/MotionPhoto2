@@ -284,7 +284,7 @@ def main():
                     fname = str(image_path.with_suffix(''))
 
                     # Check if source image is already a motion photo
-                    if is_motion_photo(input_directory / image):
+                    if is_motion_photo(input_directory / image, et):
                         print(f"Input {image} is already a motion photo, skipping muxing...")
                         if args.copy_unmuxed:
                             unmatched_images.append(image)
@@ -311,7 +311,7 @@ def main():
 
                             if args.incremental_mode:
                                 output_image_path = output_subdirectory / image_path.name
-                                if os.path.exists(output_image_path) and input_output_binary_compare(input_image,input_video,output_image_path):
+                                if os.path.exists(output_image_path) and input_output_binary_compare(input_video,output_image_path):
                                     print(f"Destination {image} is already a motion photo, skipping...")
                                     break
                             
@@ -355,7 +355,7 @@ def main():
                 for img, img_meta in zip(images, image_metadatas):
 
                     # Check if source image is already a motion photo
-                    if is_motion_photo(input_directory / img):
+                    if is_motion_photo(input_directory / img, et):
                         print(f"Input {img} is already a motion photo, skipping muxing...")
                         if args.copy_unmuxed:
                             unmatched_images.append(img)
@@ -391,20 +391,20 @@ def main():
                             if os.path.exists(output_image_path):
                                 output_metadata = et.get_metadata(output_image_path)[0]
                                 output_image_content_id = output_metadata.get('MakerNotes:ContentIdentifier')
-                                output_video_data_from_image = extract_video_from_image(output_image_path, args.verbose)
+                                output_video_data_from_image = extract_video_from_image(output_image_path, et)
 
                                 # Check if content IDs match
                                 if all((output_video_data_from_image,
                                         output_image_content_id,
-                                        output_video_data_from_image.find(output_image_content_id.strip().encode()),
-                                        output_video_data_from_image.find(content_id.strip().encode()))):
+                                        output_video_data_from_image.find(output_image_content_id.strip().encode()) != -1,
+                                        output_video_data_from_image.find(content_id.strip().encode()) != -1)):
                                         if args.verbose:
                                             print(f"[DEBUG] ContentIdentifier '{content_id.strip()}' of the source {input_image} and {output_image_path} destination matches")
                                         print(f"Destination {img} as it is already a motion photo, skipping...")
                                         continue
                                 else:
                                     # Do binary comparison to check input and output
-                                    if input_output_binary_compare(input_image,input_video,output_image_path):
+                                    if input_output_binary_compare(input_video,output_image_path):
                                         print(f"Destination {img} is already a motion photo, skipping...")
                                         continue
 
