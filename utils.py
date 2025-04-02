@@ -65,8 +65,8 @@ def extract_video_from_image(fpath: str, et: exiftool.ExifToolHelper) -> bytes:
 
     return video_in_image
 
-def input_output_binary_compare(input_image: str, input_video: str, output_image: str) -> bool:
-    if all((os.path.exists(input_image), os.path.exists(input_video), os.path.exists(output_image))):
+def input_output_binary_compare(input_video: str, output_image: str) -> bool:
+    if all((os.path.exists(input_video), os.path.exists(output_image))):
         try:
             with open(input_video, "rb") as i_vid:
                 input_video_data = i_vid.read()

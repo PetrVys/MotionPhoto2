@@ -311,7 +311,7 @@ def main():
 
                             if args.incremental_mode:
                                 output_image_path = output_subdirectory / image_path.name
-                                if os.path.exists(output_image_path) and input_output_binary_compare(input_image,input_video,output_image_path):
+                                if os.path.exists(output_image_path) and input_output_binary_compare(input_video,output_image_path):
                                     print(f"Destination {image} is already a motion photo, skipping...")
                                     break
                             
@@ -404,7 +404,7 @@ def main():
                                         continue
                                 else:
                                     # Do binary comparison to check input and output
-                                    if input_output_binary_compare(input_image,input_video,output_image_path):
+                                    if input_output_binary_compare(input_video,output_image_path):
                                         print(f"Destination {img} is already a motion photo, skipping...")
                                         continue
 
