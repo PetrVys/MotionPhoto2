@@ -75,6 +75,6 @@ SAMSUNG_TAG_IDS = {
 SAMSUNG_SEFH_VERSION = 107
 
 VIDEO_SIGNATURE = {
-    "VIDEO": "ftyp".encode('iso-8859-1'),
+    "VIDEO": [sig.encode('iso-8859-1') for sig in ["ftyp", "wide"]],
     "NOT_VIDEO": [sig.encode('iso-8859-1') for sig in ["ftypheic", "ftypM4A", "ftypavif"]]
 }
