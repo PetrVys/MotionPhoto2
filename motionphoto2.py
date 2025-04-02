@@ -353,6 +353,7 @@ def main():
                 # Match images to videos
                 i = 0
                 for img, img_meta in zip(images, image_metadatas):
+                    i += 1
 
                     # Check if source image is already a motion photo
                     if is_motion_photo(input_directory / img, et):
@@ -361,7 +362,6 @@ def main():
                             unmatched_images.append(img)
                         continue
 
-                    i += 1
                     content_id = img_meta.get('MakerNotes:ContentIdentifier')
                     if args.verbose and content_id:
                         print(f"[DEBUG] Image {img} has ContentIdentifier: {content_id}")
