@@ -61,11 +61,19 @@ def main():
     )
 
     dir_group.add_argument(
+        "-im",
+        "--incremental-mode",
+        metavar="Incremental Mode",
+        action="store_true",
+        help="Skip photos already muxed in output",
+    )
+    
+    dir_group.add_argument(
         "-cu",
         "--copy-unmuxed",
         metavar="Copy Unmuxed",
         action="store_true",
-        help="Copy files that are not Live Photos",
+        help="Copy other files",
     )
 
     dir_group.add_argument(
@@ -98,14 +106,6 @@ def main():
         help="Overwrite the original image",
     )
 
-    settings_group.add_argument(
-        "-im",
-        "--incremental-mode",
-        metavar="Incremental Mode",
-        action="store_true",
-        help="Skip muxing if output file is already a motion photo.",
-    )
-    
     settings_group.add_argument(
         "-kt",
         "--keep-temp",
