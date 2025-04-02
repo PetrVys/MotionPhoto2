@@ -396,8 +396,8 @@ def main():
                                 # Check if content IDs match
                                 if all((output_video_data_from_image,
                                         output_image_content_id,
-                                        output_video_data_from_image.find(output_image_content_id.strip().encode()),
-                                        output_video_data_from_image.find(content_id.strip().encode()))):
+                                        output_video_data_from_image.find(output_image_content_id.strip().encode()) != -1,
+                                        output_video_data_from_image.find(content_id.strip().encode()) != -1)):
                                         if args.verbose:
                                             print(f"[DEBUG] ContentIdentifier '{content_id.strip()}' of the source {input_image} and {output_image_path} destination matches")
                                         print(f"Destination {img} as it is already a motion photo, skipping...")
