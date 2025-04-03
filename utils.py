@@ -41,7 +41,7 @@ def is_motion_photo(fpath: str, et: exiftool.ExifToolHelper) -> bool:
     return False
 
 def verify_video_in_image(video_in_image: bytes) -> bool :
-    if video_in_image and video_in_image.find(const.VIDEO_SIGNATURE["VIDEO"], 0, 15) != -1:
+    if video_in_image and any([video_in_image.find(sig, 0, 15) != -1 for sig in const.VIDEO_SIGNATURE["VIDEO"]]):
         for sig in const.VIDEO_SIGNATURE["NOT_VIDEO"]:
             if video_in_image.find(sig, 0, 15) != -1:
                 return False
