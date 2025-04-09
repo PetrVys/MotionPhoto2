@@ -1,6 +1,8 @@
 exiftool.exe
 exiftool_files/
 
+motionphoto2.json
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
