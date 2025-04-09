@@ -374,7 +374,7 @@ def main():
                 for meta, vid in zip(video_metadatas, videos):
                     content_id = meta.get('QuickTime:ContentIdentifier')
                     if content_id:
-                        content_id_to_video[content_id.strip()] = vid
+                        content_id_to_video.setdefault(content_id.strip(), []).append(vid)
                         if args.verbose:
                             print(f"[DEBUG] Mapped video {vid} to ContentIdentifier: {content_id}")
                 
@@ -395,10 +395,12 @@ def main():
                         print(f"[DEBUG] Image {img} has ContentIdentifier: {content_id}")
                     if content_id and content_id.strip() in content_id_to_video:
                         print(f"=========================[{i}/{len(images)}]")
-                        video = content_id_to_video[content_id.strip()]
+                        video = content_id_to_video[content_id.strip()][0]
 
                         if args.copy_unmuxed:
-                            videos.remove(video)
+                            for vid in content_id_to_video[content_id.strip()]:
+                                if vid in videos:
+                                    videos.remove(vid)
                         
                         # Construct full paths for input files
                         input_image = input_directory / img
@@ -435,8 +437,7 @@ def main():
                                     if input_output_binary_compare(input_video,output_image_path):
                                         print(f"Destination {img} is already a motion photo, skipping...")
                                         continue
-
-                        print("Muxer running.....................................")
+                        
                         Muxer(
                             image_fpath=str(input_image),
                             video_fpath=str(input_video),
