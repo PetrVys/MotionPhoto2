@@ -1,19 +1,19 @@
 #!/usr/bin/env python3
 
 import argparse
+import exiftool
 import filecmp
 import itertools
+import logging
+import os
 import shutil
 import sys
-import os
-import exiftool
-import logging
 
 from pathlib import Path
 from gooey import GooeyParser
 
 from Muxer import Muxer
-from utils import is_motion_photo, extract_video_from_image, input_output_binary_compare
+from utils import is_motion_photo, extract_video_from_image, input_output_binary_compare, load_defaults, save_defaults
 
 logging.basicConfig(
     handlers=[logging.StreamHandler(sys.stdout)],
@@ -22,7 +22,10 @@ logging.basicConfig(
     datefmt="%d/%m/%Y %H:%M:%S"
 )
 
-def main():    
+def main():
+    
+    defaults = load_defaults()
+    
     parser = GooeyParser(
         prog="MotionPhoto2",
         description="Mux HEIC and JPG Live Photos into Google/Samsung Motion Photos",
@@ -39,7 +42,7 @@ def main():
         metavar="Input Directory",
         help="Mux all the photos and videos in a directory",
         widget='DirChooser',
-        gooey_options={'full_width':True}
+        gooey_options={'full_width':True, 'initial_value':defaults['input_directory']}
     )
     
     dir_group.add_argument(
@@ -48,7 +51,7 @@ def main():
         metavar="Recursive",
         action="store_true",
         help="Recursively process subdirectories",
-        gooey_options={'initial_value':True}
+        gooey_options={'initial_value':defaults['recursive']}
     )
 
     dir_group.add_argument(
@@ -57,7 +60,7 @@ def main():
         metavar="Match by EXIF",
         action="store_true",
         help="Match files by Live Photo metadata",
-        gooey_options={'initial_value':True}
+        gooey_options={'initial_value':defaults['exif_match']}
     )
 
     dir_group.add_argument(
@@ -66,6 +69,7 @@ def main():
         metavar="Incremental Mode",
         action="store_true",
         help="Skip photos already muxed in output",
+        gooey_options={'initial_value':defaults['incremental_mode']}
     )
     
     dir_group.add_argument(
@@ -74,6 +78,7 @@ def main():
         metavar="Copy Unmuxed",
         action="store_true",
         help="Copy other files",
+        gooey_options={'initial_value':defaults['copy_unmuxed']}
     )
 
     dir_group.add_argument(
@@ -82,7 +87,7 @@ def main():
         metavar="Output Directory",
         help="Directory where to save the resulting Motion Photos",
         widget='DirChooser',
-        gooey_options={'full_width':True}
+        gooey_options={'full_width':True, 'initial_value':defaults['output_directory']}
     )
 
     settings_group = parser.add_argument_group(
@@ -96,6 +101,7 @@ def main():
         metavar="Delete Video",
         action="store_true",
         help="Delete video after muxing",
+        gooey_options={'initial_value':defaults['delete_video']}
     )
     
     settings_group.add_argument(
@@ -104,6 +110,7 @@ def main():
         metavar="Overwrite",
         action="store_true",
         help="Overwrite the original image",
+        gooey_options={'initial_value':defaults['overwrite']}
     )
 
     settings_group.add_argument(
@@ -112,6 +119,7 @@ def main():
         metavar="Keep Temp",
         action="store_true",
         help="Keep muxing temp files",
+        gooey_options={'initial_value':defaults['keep_temp']}
     )
     
     settings_group.add_argument(
@@ -119,7 +127,8 @@ def main():
         "--verbose",
         metavar="Verbose",
         action="store_true", 
-        help="Verbose output"
+        help="Verbose output",
+        gooey_options={'initial_value':defaults['verbose']}
     )
 
     file_group = parser.add_argument_group(
@@ -138,7 +147,8 @@ def main():
                 "HEIF file|*.heif|"
                 "JPG file|*.jpg|"
                 "All files (*.*)|*.*",
-            'message': "Select image file"
+            'message': "Select image file",
+            'initial_value':defaults['input_image']
         }
     )
         
@@ -153,7 +163,8 @@ def main():
                 "MOV file|*.mov|"
                 "MP4 file|*.mp4|"
                 "All files (*.*)|*.*",
-            'message': "Select video file"
+            'message': "Select video file",
+            'initial_value':defaults['input_video']
         }
     )
 
@@ -169,7 +180,8 @@ def main():
                 "HEIF file|*.heif|"
                 "JPG file|*.jpg|"
                 "All files (*.*)|*.*",
-            'message': "Target image file"
+            'message': "Target image file",
+            'initial_value':defaults['output_file']
         }
     )
 
@@ -179,7 +191,7 @@ def main():
         metavar="No XMP",
         action="store_true",
         help="No XMP processing (just glue image and video using Samsung tags)",
-        gooey_options={'visible':False}
+        gooey_options={'visible':False, 'initial_value':defaults['no_xmp']}
     )
 
     args = parser.parse_args()
@@ -230,6 +242,22 @@ def main():
             input_directory = f"{Path(args.input_directory).resolve()}"
             if os.path.samefile(input_directory, output_directory): # Input directory and output directory cannot be same if copying unmuxed files
                 print("[ERROR] Output directory cannot be the same as input directory")
+
+    defaults['input_directory']=args.input_directory
+    defaults['recursive']=args.recursive
+    defaults['exif_match']=args.exif_match
+    defaults['incremental_mode']=args.incremental_mode
+    defaults['copy_unmuxed']=args.copy_unmuxed
+    defaults['output_directory']=args.output_directory
+    defaults['delete_video']=args.delete_video
+    defaults['overwrite']=args.overwrite
+    defaults['keep_temp']=args.keep_temp
+    defaults['verbose']=args.verbose
+    defaults['input_image']=args.input_image
+    defaults['input_video']=args.input_video
+    defaults['output_file']=args.output_file
+    defaults['no_xmp']=args.no_xmp
+    save_defaults(defaults)
             
     logger = logging.getLogger("ExifTool")
     logger.setLevel(logging.DEBUG if args.verbose else logging.INFO)
