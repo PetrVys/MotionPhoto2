@@ -223,11 +223,11 @@ def main():
         print("[ERROR] Output file cannot be use overwrite option")
         sys.exit(1)
 
-    if args.copy_unmuxed is not None and args.overwrite is True:
+    if args.copy_unmuxed is True and args.overwrite is True:
         print("[ERROR] Copy Unmuxed cannot be used with overwrite option")
         sys.exit(1)
 
-    if args.copy_unmuxed is not None and args.delete_video is True:
+    if args.copy_unmuxed is True and args.delete_video is True:
         print("[ERROR] Copy Unmuxed cannot be used with delete-video option")
         sys.exit(1)
 
