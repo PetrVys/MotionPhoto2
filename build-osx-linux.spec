@@ -31,5 +31,4 @@ exe = EXE(pyz,
           upx_exclude=[],
           console=False,
           windowed=True,
-          target_arch='universal2',
           icon=os.path.join(gooey_root, 'images', 'program_icon.ico'))
