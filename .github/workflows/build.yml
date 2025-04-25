@@ -12,6 +12,7 @@ jobs:
     permissions:
       contents: write
     runs-on: ${{ matrix.os }}
+    fail-fast: false
     strategy:
       matrix:
         include:
