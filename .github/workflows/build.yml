@@ -67,15 +67,15 @@ jobs:
         pip install -r requirements.txt 
         pip install pyinstaller       
 
-    - name: Install dependencies specific for macOS
-      if: ${{matrix.TARGET == 'macos'}}
-      run: |
-        pip install --force-reinstall --no-binary :all: psutil
-        pip download -d /tmp --only-binary :all: --platform macosx_10_13_x86_64 pillow
-        pip download -d /tmp --only-binary :all: --platform macosx_11_0_arm64 pillow
-        pip install delocate
-        delocate-merge /tmp/pillow-*
-        pip install --force-reinstall /tmp/pillow-*_universal2.whl
+    #- name: Install dependencies specific for macOS
+    #  if: ${{matrix.TARGET == 'macos'}}
+    #  run: |
+    #    pip install --force-reinstall --no-binary :all: psutil
+    #    pip download -d /tmp --only-binary :all: --platform macosx_10_13_x86_64 pillow
+    #    pip download -d /tmp --only-binary :all: --platform macosx_11_0_arm64 pillow
+    #    pip install delocate
+    #    delocate-merge /tmp/pillow-*
+    #    pip install --force-reinstall /tmp/pillow-*_universal2.whl
 
     - name: Build with pyinstaller for ${{matrix.TARGET}}
       run: ${{matrix.CMD_BUILD}}
