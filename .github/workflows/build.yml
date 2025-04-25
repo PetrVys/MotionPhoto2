@@ -12,8 +12,8 @@ jobs:
     permissions:
       contents: write
     runs-on: ${{ matrix.os }}
-    fail-fast: false
     strategy:
+      fail-fast: false
       matrix:
         include:
           - os: macos-latest
