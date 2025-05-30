@@ -25,7 +25,7 @@ def extract_track_duration(track_number: str, metadata: str) -> str:
 
 
 def read_file(fpath: str) -> bytes:
-    with open(fpath, "rb") as f:
+    with open(fpath, "rb" , encoding="utf-8") as f:
         return f.read()
 
 
@@ -70,7 +70,7 @@ def extract_video_from_image(fpath: str, et: exiftool.ExifToolHelper) -> bytes:
 def input_output_binary_compare(input_video: str, output_image: str) -> bool:
     if all((os.path.exists(input_video), os.path.exists(output_image))):
         try:
-            with open(input_video, "rb") as i_vid:
+            with open(input_video, "rb" , encoding="utf-8") as i_vid:
                 input_video_data = i_vid.read()
                 with open(output_image, "rb") as o_img:
                     output_image_data = o_img.read()
@@ -83,7 +83,7 @@ def input_output_binary_compare(input_video: str, output_image: str) -> bool:
 def load_defaults() -> Dict[str, Any]:
     try:
         scriptdir = Path(__file__).resolve().parent
-        with open(scriptdir / 'motionphoto2.json', 'r') as f:
+        with open(scriptdir / 'motionphoto2.json', 'r' , encoding="utf-8") as f:
             return json.load(f)
     except:
         return {
@@ -106,7 +106,7 @@ def load_defaults() -> Dict[str, Any]:
 def save_defaults(defaults: Dict[str, Any]):
     try:
         scriptdir = Path(__file__).resolve().parent
-        with open(scriptdir / 'motionphoto2.json', 'w') as f: 
+        with open(scriptdir / 'motionphoto2.json', 'w' , encoding="utf-8") as f: 
             json.dump(defaults, f, indent=3)       
     except:
         pass

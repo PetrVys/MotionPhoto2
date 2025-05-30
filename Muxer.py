@@ -267,7 +267,7 @@ class Muxer:
         merged_bytes += video_footer
 
         self.logger.info("Writing output file: %s", self.output_fpath)
-        with open(self.output_fpath, "wb") as binary_file:
+        with open(self.output_fpath, "wb" , encoding="utf-8") as binary_file:
             binary_file.write(merged_bytes)
         shutil.copystat(self.image_fpath, self.output_fpath)
 
