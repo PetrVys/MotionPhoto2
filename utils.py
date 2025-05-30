@@ -72,7 +72,7 @@ def input_output_binary_compare(input_video: str, output_image: str) -> bool:
         try:
             with open(input_video, "rb" , encoding="utf-8") as i_vid:
                 input_video_data = i_vid.read()
-                with open(output_image, "rb") as o_img:
+                with open(output_image, "rb" , encoding="utf-8") as o_img:
                     output_image_data = o_img.read()
                     if output_image_data.find(input_video_data) != -1:
                         return True
