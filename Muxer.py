@@ -242,7 +242,7 @@ class Muxer:
             self.change_xmpresource(str(samsung_tail.get_image_padding()), attribute=const.ITEM_PADDING, semantic="Primary")
 
             xmp_updated = self.output_fpath + ".XMP"
-            with open(xmp_updated, "wb") as f:
+            with open(xmp_updated, "wb" , encoding="utf-8") as f:
                 f.write(etree.tostring(self.xmp, pretty_print=True))
 
             xmp_image = enrich_fname(self.output_fpath, "XMP")
