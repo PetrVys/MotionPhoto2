@@ -93,7 +93,7 @@ jobs:
 
     - name: Associate the built package to the release, if any
       if: ${{ github.event_name == 'release' }}
-      uses: softprops/action-gh-release@v2
+      uses: softprops/action-gh-release@v2.2.2
       with:
         files: dist/${{ matrix.OUT_FILE_NAME}}
  
