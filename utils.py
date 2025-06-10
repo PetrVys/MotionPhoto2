@@ -83,7 +83,7 @@ def input_output_binary_compare(input_video: str, output_image: str) -> bool:
 def load_defaults() -> Dict[str, Any]:
     try:
         scriptdir = Path(__file__).resolve().parent
-        with open(scriptdir / 'motionphoto2.json', 'r') as f:
+        with open(scriptdir / 'motionphoto2.json', 'r' , encoding='utf-8') as f:
             return json.load(f)
     except:
         return {
@@ -106,7 +106,7 @@ def load_defaults() -> Dict[str, Any]:
 def save_defaults(defaults: Dict[str, Any]):
     try:
         scriptdir = Path(__file__).resolve().parent
-        with open(scriptdir / 'motionphoto2.json', 'w') as f: 
+        with open(scriptdir / 'motionphoto2.json', 'w' , encoding='utf-8') as f: 
             json.dump(defaults, f, indent=3)       
     except:
         pass
