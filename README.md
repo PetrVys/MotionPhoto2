@@ -77,15 +77,13 @@ motionphoto2 --input-directory /your/directory --exif-match
 
 ## Limitations
 
-If the source image is an Apple HDR HEIC image, Google Photos will say that the resulting photo is not HDR. This is not true - if you save the photo back to iPhone camera roll, you'll see the photo is HDR.
+HDR in Google Photos works only for HEIC photos with HDR stored in ISO/CD 21496-1 format for now. That effectively means your HEIC photos have to be shot by iPhone 15+ with iOS18+ in order to be recognized by Google Photos as HDR.
 
-Google Photos _will_ actually show it too, but only when it is stored in local photos on an iPhone/iPad.
+If the source image is not shot by iPhone 15+ on iOS18+ to HEIC, Google Photos will say that the resulting photo is not HDR. This is not true - if you save the photo back to iPhone camera roll, you'll see the photo is HDR. Google Photos _will_ actually show it too, but only when it is stored in local photos on an iPhone/iPad.
 
 The reason is probably directly related to Motion Photos - the same place where Motion Photos are defined (in XMP object GCamera - `http://ns.google.com/photos/1.0/camera/`) is also the place where Google/Android stores JPEG/R HDR information.
 
-It appears that the server-side processing of Google Photos does not check for Apple HDR once it finds Google Camera header in XMP tags. For JPG files, a conversion is possible by adjusting metadata and is on the roadmap. Unfortunately there is no support for Gainmap HDR HEIF images in libultrahdr or any modern Android devices at the moment.
-
-Hopefully, as Gainmap HDR matures, both Google and Apple will converge on ISO/CD 21496-1 and things will just start working. On Apple side this has happened already - as of iOS18 RC on iPhone 15(pro), iOS stores HDR in ISO tmap format for both JPG and HEIF. Unfortunately iPhones 12-14 are stuck with Apple Gainmaps (for JPGs, it should be possible to remux them to ISO format, though). On Google side keep an eye on [libultrahdr](https://github.com/google/libultrahdr) used in Android and also most likely in GPhotos backend. It currently only supports JPEG/R, but HEIC support [is on the way](https://github.com/google/libultrahdr/issues/195).
+It appears that the server-side processing of Google Photos does not check for Apple HDR or ISO HDR once it finds Google Camera header in XMP tags. For JPG files, a conversion is possible by adjusting metadata and is on the roadmap. For HDR HEIF files, a conversion is also theoretically possible (all that's needed is to convert Apple HDR metadata into ISO tmap metadata), but it will be very nontrivial to implement.
 
 ## Credits
 
