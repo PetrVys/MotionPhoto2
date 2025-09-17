@@ -25,6 +25,8 @@ logging.basicConfig(
 
 def main():
     
+    sys.stdout.reconfigure(errors = 'replace')
+    
     defaults = load_defaults()
     
     parser = GooeyParser(
