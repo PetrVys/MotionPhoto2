@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import argparse
+import codecs
 import exiftool
 import filecmp
 import itertools
@@ -23,9 +24,24 @@ logging.basicConfig(
     datefmt="%d/%m/%Y %H:%M:%S"
 )
 
+class Unbuffered(object):
+   def __init__(self, stream):
+       self.stream = stream
+   def write(self, data):
+       self.stream.write(data)
+       self.stream.flush()
+   def writelines(self, datas):
+       self.stream.writelines(datas)
+       self.stream.flush()
+   def __getattr__(self, attr):
+       return getattr(self.stream, attr)
+
 def main():
     
-    sys.stdout.reconfigure(errors = 'replace')
+    if sys.stdout.encoding != 'UTF-8':
+        sys.stdout = Unbuffered(codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict'))
+    if sys.stderr.encoding != 'UTF-8':
+        sys.stderr = Unbuffered(codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict'))    
     
     defaults = load_defaults()
     
