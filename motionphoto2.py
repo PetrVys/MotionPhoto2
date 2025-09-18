@@ -38,11 +38,6 @@ class Unbuffered(object):
 
 def main():
     
-    if sys.stdout.encoding != 'UTF-8':
-        sys.stdout = Unbuffered(codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict'))
-    if sys.stderr.encoding != 'UTF-8':
-        sys.stderr = Unbuffered(codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict'))    
-    
     defaults = load_defaults()
     
     parser = GooeyParser(
@@ -214,6 +209,11 @@ def main():
     )
 
     args = parser.parse_args()
+
+    if sys.stdout.encoding != 'UTF-8':
+        sys.stdout = Unbuffered(codecs.getwriter('utf-8')(sys.stdout.buffer, 'strict'))
+    if sys.stderr.encoding != 'UTF-8':
+        sys.stderr = Unbuffered(codecs.getwriter('utf-8')(sys.stderr.buffer, 'strict'))    
 
     if args.input_directory is not None and (
         args.input_image is not None or args.input_video is not None
