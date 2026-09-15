@@ -383,10 +383,21 @@ def main():
                 image_paths = [input_directory / img for img in images]
                 video_paths = [input_directory / vid for vid in videos]
                 print("Running in EXIF matching mode.")
-                print("Getting metadata for images, please wait...")
-                image_metadatas = et.get_metadata([str(p) for p in image_paths])
-                print("Getting metadata for videos, please wait...")
-                video_metadatas = et.get_metadata([str(p) for p in video_paths])
+                # ExifTool rejects an empty file list, so only ask for metadata
+                # when there is something to ask about (e.g. all videos were
+                # already consumed by a previous run with --delete-video)
+                image_metadatas = []
+                if image_paths:
+                    print("Getting metadata for images, please wait...")
+                    image_metadatas = et.get_metadata([str(p) for p in image_paths])
+                else:
+                    print("No images found, nothing to mux.")
+                video_metadatas = []
+                if video_paths:
+                    print("Getting metadata for videos, please wait...")
+                    video_metadatas = et.get_metadata([str(p) for p in video_paths])
+                else:
+                    print("No videos found, nothing to match against.")
                 
                 # Map content identifiers to video relative paths
                 content_id_to_video = {}
